@@ -1,8 +1,8 @@
 class StrategySpeedDownAndStay():
-    def __init__(self, tar_speed, change_time_per, alive_time):
+    def __init__(self, tar_speed, change_time, alive_time):
         self.job_list=[]
         self.end_time=alive_time
-        self.change_time= alive_time * (change_time_per / 100)
+        self.change_time= change_time
         self.tar_speed=tar_speed
         self.v=0
         self.w=0

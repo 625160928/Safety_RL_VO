@@ -30,7 +30,7 @@ class DirEnv(ChangeLaneEnv):
                 #设置npc车辆的目标速度
                 npc_tar_speed=50
                 #设置恢复恒速的时间
-                npc_speed_down_time=2
+                npc_speed_down_time=self._time + 2
                 #设置车辆移动策略
                 strategy=plan.strategy(npc_tar_speed,npc_speed_down_time,plan.alive_time)
                 #设置仿真模型
