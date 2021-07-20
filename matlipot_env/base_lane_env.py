@@ -69,7 +69,7 @@ class ChangeLaneEnv():
 
     #将计划里应该出现的车辆添加至npc车辆列表
     #添加计划里的车辆
-    def _update_create_npc_car(self):
+    def _update_create_npc_car(self,player_position_y):
         for plan in self._create_plan:
             #只有达到预定时间的npc车辆才会被创建
             if self._time > plan.create_time:
@@ -77,8 +77,6 @@ class ChangeLaneEnv():
                 strategy = plan.strategy
                 # 设置npc仿真模型
                 car_model = plan.car_model
-                #通过当前玩家的位置设置npc的刷新位置
-                _, player_position_y, _, _, _ = self._player_model.get_infomation()
                 # 在仿真模型中设置npc车辆位置
                 car_model.set_position(plan.lane * self._lane_length + self._lane_length / 2,
                                        player_position_y + self._obs_range + 10, math.pi / 2)
@@ -90,22 +88,30 @@ class ChangeLaneEnv():
                       player_position_y + self._obs_range + 10, math.pi / 2)
 
     # 通过npc的策略更新npc的位置
-    def _update_npc_car(self):
+    def _update_npc_car(self,player_position_y):
         obs = self.obs()
+        extra_range=20
         for npc_car in self._npc_car_list:
             v, w = npc_car.strategy.get_control(self._time, obs)
             npc_car.model.update(v, w)
+            x,y,theta,_,_=npc_car.model.get_infomation()
+            #
+            if (y>player_position_y+self._obs_range +extra_range or y<player_position_y-self._obs_range-extra_range) and(npc_car.strategy.end_time>self._time):
+                self._npc_car_list.remove(npc_car)
+
 
     #迭代
     def update(self,v,w):
         #更新时间戳
         self._time+=self._step
-        #根据时间戳创建计划车辆
-        self._update_create_npc_car()
-        #更新npc车辆的位置
-        self._update_npc_car()
         #更新玩家的位置
         self._player_model.update(v, w)
+        # 通过当前玩家的位置设置npc的刷新位置
+        _, player_position_y, _, _, _ = self._player_model.get_infomation()
+        #根据时间戳创建计划车辆
+        self._update_create_npc_car(player_position_y)
+        #更新npc车辆的位置
+        self._update_npc_car(player_position_y)
 
     #观察周围环境
     #这部分需要根据实际情况进行更改，需要讨论
