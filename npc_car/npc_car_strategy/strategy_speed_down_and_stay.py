@@ -8,9 +8,14 @@ class StrategySpeedDownAndStay():
         self.w=0
 
     def get_control(self,time,obs):
-        if time>self.change_time:
+        #进场策略
+        if time<=self.change_time:
+            self.v = self.tar_speed - 10
+        #场中运行的方法
+        if time>self.change_time and time<self.end_time:
             self.v=self.tar_speed
-        else:
-            self.v=self.tar_speed-10
+        #退场方法
+        if time>=self.end_time:
+            self.v = self.tar_speed - 10
 
         return self.v,self.w

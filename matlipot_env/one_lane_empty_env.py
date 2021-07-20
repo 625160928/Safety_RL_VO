@@ -45,7 +45,8 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
                 npc_speed_down_time = npc_appear_time + self.npc_speed_down_time
 
                 #车辆存活时间
-                alive_time=self._simulate_max_time
+                # alive_time=self._simulate_max_time
+                alive_time=npc_speed_down_time +20
 
                 # 设置车辆移动策略
                 strategy = StrategySpeedDownAndStay(npc_tar_speed, npc_speed_down_time, alive_time)

@@ -20,7 +20,7 @@ class ChangeLaneEnv():
         #npc列表里存的是 NPCCar 类
         self._npc_car_list=[]
         #观察范围
-        self._obs_range=30
+        self._obs_range=50
         #时间戳
         self._time=0
         #随机数种子，如果之后需要复现场景可以通过随机数种子重复试验
