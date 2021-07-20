@@ -22,11 +22,15 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
     # seed 随机数种子
     def __init__(self,model,init_lane=0,empty_lane=0,seed=0):
         ChangeLaneEnv.__init__(self,model,init_lane,seed)
-
+        #设置npc车辆的出现时间
         self._npc_appear_time=random.randint(0,10)
         self._npc_appear_time=2
+
+        #车辆低速运行的时间长度
         self.npc_speed_down_time=2
+        #往计划列表里添加npc车辆计划
         for i in range(0,self._lane_number):
+            #除了指定的车道不刷新车辆，其他的都要添加npc车辆
             if i!= empty_lane:
                 #随机设置车辆的出现时间
                 npc_appear_time=self._npc_appear_time+random.randint(0,10)/5
@@ -46,6 +50,7 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
                 # 设置车辆移动策略
                 strategy = StrategySpeedDownAndStay(npc_tar_speed, npc_speed_down_time, alive_time)
 
+                #添加计划
                 self._create_plan.append(PreCreateCar(self._npc_appear_time,alive_time , i,
                                                       strategy, car_model))
 
@@ -55,11 +60,6 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
 
 
 
-    def update(self,v,w):
-        self._time+=self._step
-        self._update_create_npc_car()
-        self._update_npc_car()
-        self._player_model.update(v, w)
 
 
 

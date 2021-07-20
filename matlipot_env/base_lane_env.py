@@ -93,6 +93,13 @@ class ChangeLaneEnv():
             v, w = npc_car.strategy.get_control(self._time, obs)
             npc_car.model.update(v, w)
 
+
+    def update(self,v,w):
+        self._time+=self._step
+        self._update_create_npc_car()
+        self._update_npc_car()
+        self._player_model.update(v, w)
+
     #观察周围环境
     #这部分需要根据实际情况进行更改，需要讨论
     def obs(self):
