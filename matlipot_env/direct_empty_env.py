@@ -10,14 +10,14 @@ from npc_car.car_model import simulate_car_model
 from npc_car.npc_car import NPCCar
 
 class DirEnv(ChangeLaneEnv):
-    def __init__(self,model,init_lane=0,seed=0):
+    def __init__(self,model,init_lane=0,empty_lane=0,seed=0):
         ChangeLaneEnv.__init__(self,model,init_lane,seed)
 
         self._npc_appear_time=random.randint(0,10)
         self._npc_appear_time=2
         self.npc_speed_down_time=2
         for i in range(0,self._lane_number):
-            if i!= init_lane:
+            if i!= empty_lane:
                 #随机设置车辆的出现时间
                 npc_appear_time=self._npc_appear_time+random.randint(0,10)/5
 
@@ -55,7 +55,7 @@ class DirEnv(ChangeLaneEnv):
 
 if __name__ == "__main__":
     player_model= simulate_car_model.create_car_example()
-    env=DirEnv(model=player_model,init_lane=0,seed=10)
+    env=DirEnv(model=player_model,init_lane=0,empty_lane=1,seed=10)
 
     for i in range(1000):
         env.update(50,0)
