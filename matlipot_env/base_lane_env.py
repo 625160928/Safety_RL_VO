@@ -99,7 +99,6 @@ class ChangeLaneEnv():
             if (y>player_position_y+self._obs_range +extra_range or y<player_position_y-self._obs_range-extra_range) and(npc_car.strategy.end_time>self._time):
                 self._npc_car_list.remove(npc_car)
 
-
     #迭代
     def update(self,v,w):
         #更新时间戳
@@ -115,6 +114,7 @@ class ChangeLaneEnv():
 
     #观察周围环境
     #这部分需要根据实际情况进行更改，需要讨论
+    #需要提供的数据，返回值
     def obs(self):
         player_position_x,player_position_y,player_position_theta,v,w=self._player_model.get_infomation()
         return self._time,player_position_x,player_position_y,player_position_theta,v,w

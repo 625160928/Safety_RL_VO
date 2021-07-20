@@ -28,6 +28,7 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
 
         #车辆低速运行的时间长度
         self.npc_speed_down_time=2
+
         #往计划列表里添加npc车辆计划
         for i in range(0,self._lane_number):
             #除了指定的车道不刷新车辆，其他的都要添加npc车辆
@@ -54,13 +55,6 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
                 #添加计划
                 self._create_plan.append(PreCreateCar(self._npc_appear_time,alive_time , i,
                                                       strategy, car_model))
-
-
-
-
-
-
-
 
 
 

@@ -104,9 +104,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-change_lane_simulate/
 venv/
-change_lane_simulate/
 env.bak/
 venv.bak/
 
