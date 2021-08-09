@@ -1,6 +1,5 @@
 import math
 import random
-
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
@@ -119,6 +118,15 @@ class ChangeLaneEnv():
         player_position_x,player_position_y,player_position_theta,v,w=self._player_model.get_infomation()
         return self._time,player_position_x,player_position_y,player_position_theta,v,w
 
+    def reset(self):
+        self._player_model.reset()
+        self.vel_diff = self.init_vel_diff
+        self.vel_omni = self.init_vel_omni
+        self.goal = self.init_goal
+
+        if self.random_bear:
+            start_bear = np.random.uniform(low = -pi, high = pi)
+            self.state[2, 0] = start_bear
 
 
 

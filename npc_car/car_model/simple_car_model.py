@@ -12,6 +12,12 @@ class SimpleCarModel():
         self.__wheel_dis = wl
         self._hou_xuan = hx
         self._step = step
+        
+        self.init_x = x
+        self.init_y = y
+        self.init_theta = theta
+        self.init_v = v
+        self.init_w = w
 
         self._position_x = x
         self._position_y = y

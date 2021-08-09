@@ -1,8 +1,6 @@
 import math
-
 import matplotlib.pyplot as plt
-
-from base_lane_env import ChangeLaneEnv
+from matlipot_env.base_lane_env import ChangeLaneEnv
 import random
 from npc_car.npc_car_strategy.strategy_speed_down_and_stay import StrategySpeedDownAndStay
 from npc_car.pre_create_car import  PreCreateCar
@@ -55,6 +53,12 @@ class OneLaneEmptyEnv(ChangeLaneEnv):
                 #添加计划
                 self._create_plan.append(PreCreateCar(self._npc_appear_time,alive_time , i,
                                                       strategy, car_model))
+
+    def check_done(self):
+        if self._time >1000:
+            return True
+        else:
+            return False
 
 
 

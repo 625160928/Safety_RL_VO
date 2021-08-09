@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from matplotlib import pyplot as plt
-from  .simple_car_model import  SimpleCarModel
+from npc_car.car_model.simple_car_model import SimpleCarModel
 
 class CarModel(SimpleCarModel):
     def __init__(self,x,y,theta,v=0,w=0, cl=None, cw=None, min_r=None, wl=None,
@@ -23,6 +23,13 @@ class CarModel(SimpleCarModel):
         self._v=0
         self._w=0
         return
+
+    def reset_car(self):
+        self._position_x = self.init_x
+        self._position_y = self.init_y
+        self._position_theta = self.init_theta
+        self._v=self.init_v
+        self._w=self.init_w
 
 def create_car_example():
     parking_l = 5.3
