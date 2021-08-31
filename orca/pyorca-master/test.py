@@ -90,7 +90,7 @@ while running:
             candidates = agents[:i] + agents[i + 1:]
             # print(candidates)
             new_vels[i], all_lines[i] = orca(agent, candidates, tau, dt)
-            # print(i, agent.velocity)
+            # print(i,'------------', agent.velocity)
 
         for i, agent in enumerate(agents):
             agent.velocity = new_vels[i]
