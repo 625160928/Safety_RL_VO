@@ -87,15 +87,22 @@ while running:
 
         new_vels = [None] * len(agents)
         for i, agent in enumerate(agents):
+            # print(i, agent)
             candidates = agents[:i] + agents[i + 1:]
             # print(candidates)
             new_vels[i], all_lines[i] = orca(agent, candidates, tau, dt)
-            # print(i,'------------', agent.velocity)
+            # print(i, agent.velocity)
 
         for i, agent in enumerate(agents):
             agent.velocity = new_vels[i]
             agent.position += agent.velocity * dt
-
+    """
+        self.position = array(position)
+        self.velocity = array(velocity)
+        self.radius = radius
+        self.max_speed = max_speed
+        self.pref_velocity = array(pref_velocity)"""
+    # print('pose ',agents[0].position,'v ',agents[0].velocity,'r ',agents[0].radius,'maxv ',agents[0].max_speed,'prev ',agents[0].pref_velocity)
     screen.fill(pygame.Color(0, 0, 0))
 
     for agent in agents[1:]:

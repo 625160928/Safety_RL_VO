@@ -51,8 +51,10 @@ def orca(agent, colliding_agents, t, dt):
     """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
     changed on tick *edge*, like first-order integration, otherwise the method
     undercompensates and you will still risk colliding."""
+    # print('orca ',colliding_agents)
     lines = []
     for collider in colliding_agents:
+        # print(collider)
         dv, n = get_avoidance_velocity(agent, collider, t, dt)
         line = Line(agent.velocity + dv / 2, n)
         lines.append(line)
