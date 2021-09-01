@@ -13,13 +13,13 @@ from controller import pid_lateral_controller_angle
 
 class HighWayOrca():
     def __init__(self):
-        self.dt=0.05
+        self.dt=2
         self.car_steer_limit=math.pi/3
         self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.2, K_D=0.0, K_I=0.0)
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
-            'vehicles_count':2,
+            'vehicles_count':5,
             'simulation_frequency': 150,
             'vehicles_density': 1,
             "observation": {
@@ -45,12 +45,13 @@ class HighWayOrca():
         self.env.reset()
         self.done = False
         self.acc = 4
-        self.tau = 10
-        self.prev = 10
+        self.tau = 5
+        self.prev = 5
         self.lane=1
         self.lane_length=4
         # 速度P控制器系数 1
         self.Speed_Kp = 0.1
+        self.car_radiu=3
 
 
 
@@ -96,7 +97,7 @@ class HighWayOrca():
                     if i !=0:
                         pd=True
                 if pd:
-                    agents.append(Agent((obj[1], obj[2]), (obj[3], obj[4]), 2., self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5])))
+                    agents.append(Agent((obj[1], obj[2]), (obj[3], obj[4]), self.car_radiu, self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5])))
                     # print('pre ',obj[0],' x ',obj[1],' y ',obj[2],' vx ',obj[3],' vy ',obj[4],' cosh ',obj[5],' sinh ',obj[6] )
             # print('info ',info)
 
@@ -106,7 +107,7 @@ class HighWayOrca():
             # print('pose ',agents[0].position,' theta ',theta*180/math.pi,math.sin(theta))
 
             # 计算orca避障速度
-            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2,14])
+            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2,14-agents[0].radius/2])
             # print('line ',all_line)
             # 将速度转换为动作指令
             action = self.change_vxvy_to_action(agents[0], new_vels)
@@ -119,11 +120,13 @@ class HighWayOrca():
             self.draw(agents[0], agents[1:],all_line,new_vels)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
-        plt.figure(num='route', dpi=70 )
-        plt.clf()
         #设置显示范围
         show_range=30
         ylimit=[-5,18]
+        show_rate=12
+
+        plt.figure(num='route', figsize=(show_range*6/show_rate,(ylimit[1]-ylimit[0])/show_rate) )
+        plt.clf()
         # 画图
         x_major_locator = MultipleLocator(10)
         y_major_locator = MultipleLocator(10)
@@ -160,8 +163,8 @@ class HighWayOrca():
         # print(len(lines),len(agents))
 
         # plt.show()
-        plt.pause(0.1)
-        input()
+        plt.pause(0.2)
+        # input()
 
     def draw_circle(self, agent, colr="r"):
         r=agent.radius
@@ -177,10 +180,15 @@ class HighWayOrca():
         plt.plot([x,x+agent.velocity[0]/5],[y,y+agent.velocity[1]/5], color=colr, linestyle='-')
 
     def draw_half_line(self,agent:Agent,line:Line):
+        len=50
         init_pose=agent.position+line.point
         # print('after ',init_pose,agent.position,line.point)
         plt.plot([init_pose[0],init_pose[0]+line.direction[0]],[init_pose[1],init_pose[1]+line.direction[1]],color='green')
-        plt.scatter(init_pose[0],init_pose[1],color='green')
+        pre=perp(line.direction)
+        plt.plot([init_pose[0],init_pose[0]+pre[0]*len],[init_pose[1],init_pose[1]+pre[1]*len],color='green')
+        plt.plot([init_pose[0],init_pose[0]-pre[0]*len],[init_pose[1],init_pose[1]-pre[1]*len],color='green')
+
+        # plt.scatter(init_pose[0],init_pose[1],color='green')
 
 def main():
    new_highway_orca=HighWayOrca()
