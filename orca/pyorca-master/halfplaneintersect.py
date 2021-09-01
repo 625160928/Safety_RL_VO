@@ -64,12 +64,80 @@ def halfplane_optimize(lines, optimal_point):
         # the feasible interval of the intersection of all the lines added so
         # far with the current one.
         prev_lines = itertools.islice(lines, i)
-        left_dist, right_dist = line_halfplane_intersect(line, prev_lines)
+        try:
+            left_dist, right_dist = line_halfplane_intersect(line, prev_lines)
 
-        # Now project the optimal point onto the line segment defined by the
-        # the above bounds. This gives us our new best point.
-        point = point_line_project(line, optimal_point, left_dist, right_dist)
+            # Now project the optimal point onto the line segment defined by the
+            # the above bounds. This gives us our new best point.
+            point = point_line_project(line, optimal_point, left_dist, right_dist)
+        except:
+            print("softmax ",len(lines))
+            left_dist, right_dist = line_halfplane_intersect(line, prev_lines)
+            print("???")
+            arr= line_halfplane_softmax(line, prev_lines)
+            print(len(arr),arr)
+            raise InfeasibleError
     return point
+
+
+def line_halfplane_softmax(line, other_lines):
+    """Compute the signed offsets of the interval on the edge of the
+    half-plane defined by line that is included in the half-planes defined by
+    other_lines.
+
+    The offsets are relative to line's anchor point, in units of line's
+    direction.
+
+    """
+    # We use the line intersection algorithm presented in
+    # http://stackoverflow.com/a/565282/126977 to determine the intersection
+    # point. "Left" is the negative of the canonical direction of the line.
+    # "Right" is positive.
+    left_dist = float("-inf")
+    right_dist = float("inf")
+    arr_list=[]
+    count=0
+    for prev_line in other_lines:
+        count+=1
+        # print(count)
+        num1 = dot(prev_line.direction, line.point - prev_line.point)
+        den1 = det((line.direction, prev_line.direction))
+        # num2 = det((perp(prev_line.direction), line.point - prev_line.point))
+        # den2 = det((perp(line.direction), perp(prev_line.direction)))
+
+        # assert abs(den1 - den2) < 1e-6, (den1, den2)
+        # assert abs(num1 - num2) < 1e-6, (num1, num2)
+
+        num = num1
+        den = den1
+
+        # Check for zero denominator, since ZeroDivisionError (or rather
+        # FloatingPointError) won't necessarily be raised if using numpy.
+        if den == 0:
+            print(" ??parr? ")
+            # The half-planes are parallel.
+            if num < 0:
+                # The intersection of the half-planes is empty; there is no
+                # solution.
+                raise InfeasibleError
+            else:
+                # The *half-planes* intersect, but their lines don't cross, so
+                # ignore.
+                continue
+
+        # Signed offset of the point of intersection, relative to the line's
+        # anchor point, in units of the line's direction.
+        offset = num / den
+        if den > 0:
+            # Point of intersection is to the right.
+            # right_dist = min((right_dist, offset))
+            arr_list.append([float("-inf"),offset])
+        else:
+            # Point of intersection is to the left.
+            # left_dist = max((left_dist, offset))
+
+            arr_list.append([offset,float("inf")])
+    return arr_list
 
 def point_line_project(line, point, left_bound, right_bound):
     """Project point onto the line segment defined by line, which is in
@@ -127,6 +195,7 @@ def line_halfplane_intersect(line, other_lines):
         # Signed offset of the point of intersection, relative to the line's
         # anchor point, in units of the line's direction.
         offset = num / den
+        # print('offset ',offset)
         if den > 0:
             # Point of intersection is to the right.
             right_dist = min((right_dist, offset))
@@ -134,9 +203,13 @@ def line_halfplane_intersect(line, other_lines):
             # Point of intersection is to the left.
             left_dist = max((left_dist, offset))
 
-        if left_dist > right_dist:
-            # The interval is inconsistent, so the feasible region is empty.
-            raise InfeasibleError
+        # if left_dist > right_dist:
+        #     print('error ',left_dist,right_dist,offset)
+        #     # The interval is inconsistent, so the feasible region is empty.
+        #     raise InfeasibleError
+    if left_dist > right_dist:
+        print("chick")
+        return  right_dist,left_dist
     return left_dist, right_dist
 
 def perp(a):

@@ -49,11 +49,13 @@ class Agent(object):
 
 limit_range=[-20,34]
 
-def orca(agent, colliding_agents, t, dt,limit=limit_range):
+def orca(agent, colliding_agents, t, dt, limit=None):
     """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
     changed on tick *edge*, like first-order integration, otherwise the method
     undercompensates and you will still risk colliding."""
     # print('orca ',colliding_agents)
+    if limit is None:
+        limit = limit_range
     lines = []
     for collider in colliding_agents:
         # print(collider)
@@ -62,6 +64,8 @@ def orca(agent, colliding_agents, t, dt,limit=limit_range):
         lines.append(line)
     lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
     lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
+    # print('limit ',limit)
+    # print("?? ",[0,limit[0]-agent.position[1]], [0,1])
     return halfplane_optimize(lines, agent.pref_velocity), lines
 
 def get_avoidance_velocity(agent, collider, t, dt):
