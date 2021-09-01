@@ -1,7 +1,11 @@
 import numpy as np
 from collections import deque
 import math
-from geometry_msgs.msg import Point  # pylint: disable=import-error
+
+class Point():
+    def __init__(self):
+        self.x=0
+        self.y=0
 
 class PIDLongitudinalController(object):  # pylint: disable=too-few-public-methods
     """

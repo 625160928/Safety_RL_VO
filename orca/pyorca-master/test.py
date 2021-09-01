@@ -104,7 +104,9 @@ while running:
         self.pref_velocity = array(pref_velocity)"""
     # print('pose ',agents[0].position,'v ',agents[0].velocity,'r ',agents[0].radius,'maxv ',agents[0].max_speed,'prev ',agents[0].pref_velocity)
     screen.fill(pygame.Color(0, 0, 0))
-
+    print('-------------------')
+    for i in range(len(all_lines[0])):
+        print(i,all_lines[0][i])
     for agent in agents[1:]:
         draw_orca_circles(agents[0], agent)
 
@@ -112,17 +114,18 @@ while running:
         draw_agent(agent, color)
         draw_velocity(agent)
         # print(sqrt(norm_sq(agent.velocity)))
-
     for line in all_lines[0]:
         # Draw ORCA line
         alpha = agents[0].position + line.point + perp(line.direction) * 100
         beta = agents[0].position + line.point + perp(line.direction) * -100
-        pygame.draw.line(screen, (255, 255, 255), rint(alpha * scale + O).astype(int), rint(beta * scale + O).astype(int), 1)
-
+        pygame.draw.line(screen, (255, 0, 0), rint(alpha * scale + O).astype(int), rint(beta * scale + O).astype(int), 1)
         # Draw normal to ORCA line
         gamma = agents[0].position + line.point
         delta = agents[0].position + line.point + line.direction
-        pygame.draw.line(screen, (255, 255, 255), rint(gamma * scale + O).astype(int), rint(delta * scale + O).astype(int), 1)
+        pygame.draw.line(screen, (0,0, 255), rint(gamma * scale + O).astype(int), rint(delta * scale + O).astype(int), 1)
+
+        # print(rint(alpha * scale + O).astype(int), rint(beta * scale + O).astype(int),' - ',rint(gamma * scale + O).astype(int), rint(delta * scale + O).astype(int))
+        # print()
 
     pygame.display.flip()
 

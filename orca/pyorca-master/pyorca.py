@@ -38,16 +38,18 @@ from halfplaneintersect import halfplane_optimize, Line, perp
 
 class Agent(object):
     """A disk-shaped agent."""
-    def __init__(self, position, velocity, radius, max_speed, pref_velocity):
+    def __init__(self, position, velocity, radius, max_speed, pref_velocity,theta=None):
         super(Agent, self).__init__()
         self.position = array(position)
         self.velocity = array(velocity)
         self.radius = radius
         self.max_speed = max_speed
         self.pref_velocity = array(pref_velocity)
+        self.theta=theta
 
+limit_range=[-20,34]
 
-def orca(agent, colliding_agents, t, dt):
+def orca(agent, colliding_agents, t, dt,limit=limit_range):
     """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
     changed on tick *edge*, like first-order integration, otherwise the method
     undercompensates and you will still risk colliding."""
@@ -58,6 +60,8 @@ def orca(agent, colliding_agents, t, dt):
         dv, n = get_avoidance_velocity(agent, collider, t, dt)
         line = Line(agent.velocity + dv / 2, n)
         lines.append(line)
+    lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
+    lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
     return halfplane_optimize(lines, agent.pref_velocity), lines
 
 def get_avoidance_velocity(agent, collider, t, dt):
