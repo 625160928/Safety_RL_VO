@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from halfplaneintersect import Line
 from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp
-
+import pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
 
@@ -15,7 +15,7 @@ class HighWayOrca():
     def __init__(self):
         self.dt=2
         self.car_steer_limit=math.pi/3
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.2, K_D=0.0, K_I=0.0)
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.3, K_D=0.0, K_I=0.0)
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
@@ -46,12 +46,12 @@ class HighWayOrca():
         self.done = False
         self.acc = 4
         self.tau = 5
-        self.prev = 5
+        self.prev = 20
         self.lane=1
         self.lane_length=4
         # 速度P控制器系数 1
-        self.Speed_Kp = 0.1
-        self.car_radiu=3
+        self.Speed_Kp = 0.03
+        self.car_radiu=3.5
 
 
 
@@ -64,17 +64,22 @@ class HighWayOrca():
         return  [math.cos(theta)*v,  math.sin(theta)*v]
 
     def change_vxvy_to_action(self,agent:Agent,control_v):
-        l=math.hypot(control_v[0],control_v[1])
+        l=control_v[0]
         # print(agent.position[0],agent.position[1],agent.theta*180/math.pi)
         control_theta=math.atan2(control_v[1],control_v[0])
         goal_x=math.cos(control_theta)*l
         goal_y=math.sin(control_theta)*l
-        now_v=math.hypot(agent.velocity[0],agent.velocity[1])
+
+        now_v=agent.velocity[0]
+
         steer=self.later_pid.run_step(0, 0, agent.theta, goal_x, goal_y, control_theta, now_v)
-        # return steer
+
         ai= self.__PControl(now_v, l)
+
         action=[ai,-steer]
+
         print('pose ',agent.position,agent.theta,'pre-v',agent.pref_velocity,'orca-v',control_v,'action ',action)
+
         return action
         # return [0.5,0]
 
@@ -108,16 +113,18 @@ class HighWayOrca():
 
             # 计算orca避障速度
             new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2,14-agents[0].radius/2])
-            # print('line ',all_line)
+
             # 将速度转换为动作指令
-            action = self.change_vxvy_to_action(agents[0], new_vels)
-            # print('old v',agents[0].velocity,'new v ',new_vels,' action ',action,' pre  ',agents[0].pref_velocity,theta*180/math.pi)
-            # print(action, agents[0].position, agents[0].pref_velocity, new_vels)
+            # action = self.change_vxvy_to_action(agents[0], new_vels)
+            # new_v=new_vels
+
+            action=new_vels
+            new_v=pyorca.control_v_create(agents[0],action, self.tau)
 
             self.env.render()
             # input()
 
-            self.draw(agents[0], agents[1:],all_line,new_vels)
+            self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
@@ -139,13 +146,6 @@ class HighWayOrca():
         plt.gca().invert_yaxis()
 
 
-        #绘制控制车辆
-        self.draw_circle(my_agent, colr='black')
-
-        #绘制控制车辆各种速度
-        # plt.plot([my_agent.position[0],my_agent.position[0]+my_agent.pref_velocity[0]],[my_agent.position[1],my_agent.position[1]+my_agent.pref_velocity[1]], color='red')
-        plt.plot([my_agent.position[0], my_agent.position[0] + v_opt[0]],
-                 [my_agent.position[1], my_agent.position[1] +v_opt[1]], color='blue')
 
         #绘制车道线
         for i in range(5):
@@ -160,10 +160,17 @@ class HighWayOrca():
             # print('before ',line)
             self.draw_half_line(my_agent,line)
 
-        # print(len(lines),len(agents))
+        # 绘制控制车辆
+        self.draw_circle(my_agent, colr='black')
 
-        # plt.show()
-        plt.pause(0.2)
+        # 绘制控制车辆各种速度
+        # plt.plot([my_agent.position[0],my_agent.position[0]+my_agent.pref_velocity[0]],[my_agent.position[1],my_agent.position[1]+my_agent.pref_velocity[1]], color='red')
+        plt.plot([my_agent.position[0], my_agent.position[0] + v_opt[0]],
+                 [my_agent.position[1], my_agent.position[1] + v_opt[1]], color='blue')
+
+
+        plt.show()
+        # plt.pause(0.2)
         # input()
 
     def draw_circle(self, agent, colr="r"):

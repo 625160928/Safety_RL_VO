@@ -23,9 +23,12 @@ S. J. Guy, M. Lin and D. Manocha in 'Reciprocal n-body Collision Avoidance'."""
 
 from __future__ import division
 
+import math
+
 import numpy
 from numpy import array, sqrt, copysign, dot
 from numpy.linalg import det
+import numpy as np
 
 from halfplaneintersect import halfplane_optimize, Line, perp
 
@@ -62,11 +65,120 @@ def orca(agent, colliding_agents, t, dt, limit=None):
         dv, n = get_avoidance_velocity(agent, collider, t, dt)
         line = Line(agent.velocity + dv / 2, n)
         lines.append(line)
+        print('rela ',collider.position,collider.velocity,' -- ',agent.velocity + dv / 2, n)
     lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
     lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
     # print('limit ',limit)
     # print("?? ",[0,limit[0]-agent.position[1]], [0,1])
-    return halfplane_optimize(lines, agent.pref_velocity), lines
+    # return halfplane_optimize(lines, agent.pref_velocity), lines
+    return control_potimize(lines, agent,t,dt), lines
+
+def control_potimize(lines, agent,t,dt):
+    derta_acc=0.1
+    derta_steer=0.05
+    acc_range_number=3
+    steer_range_number=3
+    contorl_arr=[]
+    reward_arr=[]
+    for i in range(-acc_range_number,acc_range_number+1):
+        for j in range(-steer_range_number,steer_range_number+1):
+            control=control_create(agent, i * derta_acc, j * derta_steer)
+            # print(control)
+
+            tmp_reward= reward_control(agent,control, t, dt, lines)
+
+            contorl_arr.append(control)
+            reward_arr.append(tmp_reward)
+
+    final_control=control_choose(agent,reward_arr,contorl_arr,t)
+
+    print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
+    return final_control
+
+def control_choose(agent:Agent,rewards,actions,t):
+    min_coll=9999
+    for i in range(len(rewards)):
+        if rewards[i][0]<min_coll:
+            min_coll=rewards[i][0]
+
+    min_reward=99999
+    min_action=[]
+    for i in range(len(rewards)):
+        if rewards[i][0]==min_coll:
+            control_v=control_v_create(agent, actions[i], t)
+            tmp_reward=rewards[i][1]+math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
+            print("action ",rewards[i],actions[i],math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1]))
+            if tmp_reward<min_reward:
+                min_reward=tmp_reward
+                min_action=actions[i]
+
+
+    print("control choose")
+    return min_action
+
+def control_create(agent, a_speed, a_w):
+    return [a_speed, a_w]
+
+# 简单的位置计算
+def control_v_create(agent:Agent,control, t):
+    theta=agent.theta
+    v=agent.velocity[0]+control[0]*t
+    v_pose=[v*math.cos(theta),v*math.sin(theta)]
+    v_w=[control[1]*t*math.sin(theta),control[1]*t*math.cos(theta)]
+    return [v_pose[0]+v_w[0],v_pose[1]+v_w[1]]
+
+def reward_control(agent,control, t, dt, lines,route_anylize=False):
+
+    if route_anylize :
+        t_count=int(t/dt)
+        reward=[0,0]
+        for i in range(t_count):
+            control_v = control_v_create(agent,control, i*dt)
+            tmp_reward=reward_point_to_lines(control_v,lines)
+            reward[0]+=tmp_reward[0]
+            reward[1]+=tmp_reward[1]
+        reward[0]=reward[0]/t_count
+        reward[1] = reward[1] / t_count
+    else:
+        control_v = control_v_create(agent,control, t)
+        reward=reward_point_to_lines(control_v,lines)
+    return reward
+
+def reward_point_to_lines(point,lines):
+    reward=0
+    count=0
+    for line in lines:
+        re=reward_point_to_line(point,line)
+        if re !=0:
+            count+=1
+            reward+=re
+    return [count,reward]
+
+def reward_point_to_line(point,line):
+    x=np.array(point-line.point)
+    y=np.array(line.direction)
+    Lx = np.sqrt(x.dot(x))
+    Ly = np.sqrt(y.dot(y))
+    v3=np.array(x-y)
+    Lc=np.sqrt(v3.dot(v3))
+    cos_angle = (Lx*Lx+Ly*Ly-Lc*Lc)/(2*Ly*Lx)
+    # print(cos_angle*180/math.pi)
+    # theta = math.acos(cos_angle)
+    if cos_angle>1:
+        cos_angle=1
+    if cos_angle<-1:
+        cos_angle=-1
+    theta=math.atan2(math.sqrt(1-cos_angle*cos_angle ),cos_angle)
+    # print(theta/math.pi*180)
+    if theta<=math.pi/2:
+        return 0
+    else:
+        if line.direction[0]!=0:
+            k=line.direction[1]/line.direction[0]
+            distant=abs(k*x[0]-x[1])/math.sqrt(k*k+1)
+        else:
+            distant=abs(x[0])
+        return distant
 
 def get_avoidance_velocity(agent, collider, t, dt):
     """Get the smallest relative change in velocity between agent and collider
@@ -168,3 +280,8 @@ def normalized(x):
 
 def dist_sq(a, b):
     return norm_sq(b - a)
+
+
+if __name__ == '__main__':
+    # print(reward_point_to_line(point=[0,10],line=Line([0,0],[-1,-1])))
+    control_potimize(0,0,0,0)
