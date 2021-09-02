@@ -20,8 +20,10 @@ class HighWayOrca():
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
             'vehicles_count':5,
-            'simulation_frequency': 150,
+            'simulation_frequency': 50,
             'vehicles_density': 1,
+            "policy_frequency": 10,
+            "duration": 400,
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 15,
@@ -46,7 +48,7 @@ class HighWayOrca():
         self.done = False
         self.acc = 4
         self.tau = 5
-        self.prev = 20
+        self.prev = 40
         self.lane=1
         self.lane_length=4
         # 速度P控制器系数 1
@@ -169,8 +171,8 @@ class HighWayOrca():
                  [my_agent.position[1], my_agent.position[1] + v_opt[1]], color='blue')
 
 
-        plt.show()
-        # plt.pause(0.2)
+        # plt.show()
+        plt.pause(0.01)
         # input()
 
     def draw_circle(self, agent, colr="r"):

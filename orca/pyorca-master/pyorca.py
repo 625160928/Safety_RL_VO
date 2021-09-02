@@ -116,6 +116,12 @@ def control_choose(agent:Agent,rewards,actions,t):
     print("control choose")
     return min_action
 
+def reward_limit(agent,control_v):
+    if agent.position[1]+control_v[1]<-1 or agent.position[1]+control_v[1]>13:
+        return 999
+    return 0
+
+
 def control_create(agent, a_speed, a_w):
     return [a_speed, a_w]
 
@@ -142,6 +148,7 @@ def reward_control(agent,control, t, dt, lines,route_anylize=False):
     else:
         control_v = control_v_create(agent,control, t)
         reward=reward_point_to_lines(control_v,lines)
+        reward[1]+=reward_limit(agent,control_v)
     return reward
 
 def reward_point_to_lines(point,lines):
