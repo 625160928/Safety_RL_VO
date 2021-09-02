@@ -76,8 +76,8 @@ def orca(agent, colliding_agents, t, dt, limit=None):
 def control_potimize(lines, agent,t,dt):
     derta_acc=0.1
     derta_steer=0.05
-    acc_range_number=3
-    steer_range_number=3
+    acc_range_number=10
+    steer_range_number=10
     contorl_arr=[]
     reward_arr=[]
     for i in range(-acc_range_number,acc_range_number+1):
@@ -100,17 +100,31 @@ def control_choose(agent:Agent,rewards,actions,t):
     for i in range(len(rewards)):
         if rewards[i][0]<min_coll:
             min_coll=rewards[i][0]
+    w_speed=0.3
+    w_orca=0.3
+    w_rank=0.4
 
     min_reward=99999
     min_action=[]
-    for i in range(len(rewards)):
-        if rewards[i][0]==min_coll:
+    if min_reward==0:
+        for i in range(len(rewards)):
+            if rewards[i][0]==min_coll:
+                control_v=control_v_create(agent, actions[i], t)
+                tmp_reward=rewards[i][1]+math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
+                if tmp_reward<min_reward:
+                    min_reward=tmp_reward
+                    min_action=actions[i]
+    else:
+        for i in range(len(rewards)):
             control_v=control_v_create(agent, actions[i], t)
-            tmp_reward=rewards[i][1]+math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
-            print("action ",rewards[i],actions[i],math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1]))
-            if tmp_reward<min_reward:
-                min_reward=tmp_reward
-                min_action=actions[i]
+            re_speed=math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
+            re_orca=rewards[i][1]
+            re_rank=rewards[i][0]
+            tmp_reward=w_speed*re_speed+w_orca*re_orca+w_rank*re_rank
+            if tmp_reward < min_reward:
+                min_reward = tmp_reward
+                min_action = actions[i]
+
 
 
     print("control choose")

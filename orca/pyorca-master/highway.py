@@ -19,7 +19,7 @@ class HighWayOrca():
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
-            'vehicles_count':5,
+            'vehicles_count':20,
             'simulation_frequency': 50,
             'vehicles_density': 1,
             "policy_frequency": 10,
@@ -48,7 +48,7 @@ class HighWayOrca():
         self.done = False
         self.acc = 4
         self.tau = 5
-        self.prev = 40
+        self.prev = 35
         self.lane=1
         self.lane_length=4
         # 速度P控制器系数 1
@@ -126,7 +126,7 @@ class HighWayOrca():
             self.env.render()
             # input()
 
-            self.draw(agents[0], agents[1:],all_line,new_v)
+            # self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
