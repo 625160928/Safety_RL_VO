@@ -20,9 +20,9 @@ class HighWayOrca():
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
             'vehicles_count':20,
-            'simulation_frequency': 50,
+            'simulation_frequency': 40,
             'vehicles_density': 1,
-            "policy_frequency": 10,
+            "policy_frequency":20,
             "duration": 400,
             "observation": {
                 "type": "Kinematics",
@@ -80,7 +80,7 @@ class HighWayOrca():
 
         action=[ai,-steer]
 
-        print('pose ',agent.position,agent.theta,'pre-v',agent.pref_velocity,'orca-v',control_v,'action ',action)
+        print('pose ',agent.position,agent.theta*180/math.pi,' now_speed ',agent.velocity,'pre-v',agent.pref_velocity,'orca-v',control_v,'action ',action)
 
         return action
         # return [0.5,0]
@@ -117,11 +117,11 @@ class HighWayOrca():
             new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2,14-agents[0].radius/2])
 
             # 将速度转换为动作指令
-            # action = self.change_vxvy_to_action(agents[0], new_vels)
-            # new_v=new_vels
+            action = self.change_vxvy_to_action(agents[0], new_vels)
+            new_v=new_vels
 
-            action=new_vels
-            new_v=pyorca.control_v_create(agents[0],action, self.tau)
+            # action=new_vels
+            # new_v=pyorca.control_v_create(agents[0],action, self.tau)
 
             self.env.render()
             # input()

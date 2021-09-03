@@ -65,13 +65,89 @@ def orca(agent, colliding_agents, t, dt, limit=None):
         dv, n = get_avoidance_velocity(agent, collider, t, dt)
         line = Line(agent.velocity + dv / 2, n)
         lines.append(line)
-        print('rela ',collider.position,collider.velocity,' -- ',agent.velocity + dv / 2, n)
+        # print('rela ',collider.position,collider.velocity,' -- ',agent.velocity + dv / 2, n)
     lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
     lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
     # print('limit ',limit)
     # print("?? ",[0,limit[0]-agent.position[1]], [0,1])
+
+    #defeat
     # return halfplane_optimize(lines, agent.pref_velocity), lines
-    return control_potimize(lines, agent,t,dt), lines
+
+    #action
+    # return control_potimize(lines, agent,t,dt), lines
+
+    #velo
+    return speed_optimize(lines, agent,t,dt), lines
+
+def speed_optimize(lines, agent,t,dt):
+    derta_vx=0.3
+    derta_vy=0.3
+    acc_range_number=20
+    steer_range_number=20
+    contorl_arr=[]
+    reward_arr=[]
+    init_vx,init_vy=get_vxvy_from_agent(agent)
+    for i in range(-acc_range_number,acc_range_number+1):
+        for j in range(-steer_range_number,steer_range_number+1):
+            tmp_vx=init_vx+i*derta_vx
+            tmp_vy=init_vy+j*derta_vy
+            tmp_reward=reward_speed(agent,[tmp_vx,tmp_vy], t, dt, lines)
+
+            contorl_arr.append([tmp_vx,tmp_vy])
+            reward_arr.append(tmp_reward)
+
+    final_control = speed_choose(agent, reward_arr, contorl_arr, t)
+
+    # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
+    return final_control
+
+def speed_choose(agent:Agent,rewards,actions,t):
+    min_coll=9999
+    for i in range(len(rewards)):
+        if rewards[i][0]<min_coll:
+            min_coll=rewards[i][0]
+    w_speed=0.3
+    w_orca=0.3
+    w_rank=0.4
+
+    min_reward=99999
+    min_action=[]
+    record_reward=[]
+    if min_reward==0:
+        for i in range(len(rewards)):
+            if rewards[i][0]==min_coll:
+                control_v=actions[i]
+                tmp_reward=rewards[i][1]+math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
+                if tmp_reward<min_reward:
+                    min_reward=tmp_reward
+                    min_action=actions[i]
+    else:
+        for i in range(len(rewards)):
+            control_v=actions[i]
+            re_speed=math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
+            re_orca=rewards[i][1]
+            re_rank=rewards[i][0]
+            record_reward =[re_speed,re_orca,re_rank]
+            tmp_reward=w_speed*re_speed+w_orca*re_orca+w_rank*re_rank
+            if tmp_reward < min_reward:
+                min_reward = tmp_reward
+                min_action = actions[i]
+
+
+    print('speed reward ',min_reward,record_reward ,' action ',min_action)
+    # print("control choose")
+    return min_action
+
+def get_vxvy_from_agent(agent):
+    vx=agent.velocity[0]*math.cos(agent.theta)
+    vy=agent.velocity[0]*math.sin(agent.theta)
+    return vx,vy
+
+def reward_speed(agent,control_v, t, dt, lines):
+    reward = reward_point_to_lines(control_v, lines)
+    reward[1] += reward_limit(agent, control_v)
+    return reward
 
 def control_potimize(lines, agent,t,dt):
     derta_acc=0.1
@@ -92,7 +168,7 @@ def control_potimize(lines, agent,t,dt):
 
     final_control=control_choose(agent,reward_arr,contorl_arr,t)
 
-    print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
+    # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
     return final_control
 
 def control_choose(agent:Agent,rewards,actions,t):
@@ -106,6 +182,7 @@ def control_choose(agent:Agent,rewards,actions,t):
 
     min_reward=99999
     min_action=[]
+    record_reward=[]
     if min_reward==0:
         for i in range(len(rewards)):
             if rewards[i][0]==min_coll:
@@ -120,21 +197,21 @@ def control_choose(agent:Agent,rewards,actions,t):
             re_speed=math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
             re_orca=rewards[i][1]
             re_rank=rewards[i][0]
+            record_reward =[re_speed,re_orca,re_rank]
             tmp_reward=w_speed*re_speed+w_orca*re_orca+w_rank*re_rank
             if tmp_reward < min_reward:
                 min_reward = tmp_reward
                 min_action = actions[i]
 
 
-
-    print("control choose")
+    print('reward ',min_reward,record_reward ,' action ',min_action)
+    # print("control choose")
     return min_action
 
 def reward_limit(agent,control_v):
     if agent.position[1]+control_v[1]<-1 or agent.position[1]+control_v[1]>13:
         return 999
     return 0
-
 
 def control_create(agent, a_speed, a_w):
     return [a_speed, a_w]
