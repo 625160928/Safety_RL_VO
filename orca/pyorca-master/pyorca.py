@@ -81,7 +81,7 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     return speed_optimize(lines, agent,t,dt), lines
 
 def speed_optimize(lines, agent,t,dt):
-    derta_vx=0.3
+    derta_vx=0.6
     derta_vy=0.3
     acc_range_number=20
     steer_range_number=20
@@ -93,12 +93,12 @@ def speed_optimize(lines, agent,t,dt):
             tmp_vx=init_vx+i*derta_vx
             tmp_vy=init_vy+j*derta_vy
             tmp_reward=reward_speed(agent,[tmp_vx,tmp_vy], t, dt, lines)
-
+            # print('reward ',tmp_reward,' action  ',[tmp_vx,tmp_vy],i,j,' ori ',init_vx,init_vy)
             contorl_arr.append([tmp_vx,tmp_vy])
             reward_arr.append(tmp_reward)
 
     final_control = speed_choose(agent, reward_arr, contorl_arr, t)
-
+    print('final reward ',reward_arr[contorl_arr.index(final_control)],' derta v control ',final_control[0]-init_vx,final_control[1]-init_vy)
     # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
     return final_control
 
@@ -107,14 +107,14 @@ def speed_choose(agent:Agent,rewards,actions,t):
     for i in range(len(rewards)):
         if rewards[i][0]<min_coll:
             min_coll=rewards[i][0]
-    w_speed=0.3
-    w_orca=0.3
-    w_rank=0.4
+    w_speed=0.15
+    w_orca=0.65
+    w_rank=0.2
 
     min_reward=99999
     min_action=[]
     record_reward=[]
-    if min_reward==0:
+    if min_reward==-1:
         for i in range(len(rewards)):
             if rewards[i][0]==min_coll:
                 control_v=actions[i]
@@ -128,21 +128,25 @@ def speed_choose(agent:Agent,rewards,actions,t):
             re_speed=math.hypot(agent.pref_velocity[0]-control_v[0],agent.pref_velocity[1]-control_v[1])
             re_orca=rewards[i][1]
             re_rank=rewards[i][0]
-            record_reward =[re_speed,re_orca,re_rank]
             tmp_reward=w_speed*re_speed+w_orca*re_orca+w_rank*re_rank
+            # print(actions[i],'--',w_speed*re_speed,w_orca*re_orca,w_rank*re_rank)
             if tmp_reward < min_reward:
                 min_reward = tmp_reward
+                record_reward =[re_speed,re_orca,re_rank]
                 min_action = actions[i]
 
 
-    print('speed reward ',min_reward,record_reward ,' action ',min_action)
+    # print('speed reward ',min_reward,record_reward ,' action ',min_action)
     # print("control choose")
     return min_action
 
-def get_vxvy_from_agent(agent):
-    vx=agent.velocity[0]*math.cos(agent.theta)
-    vy=agent.velocity[0]*math.sin(agent.theta)
-    return vx,vy
+def get_vxvy_from_agent(agent:Agent):
+
+    beta = np.arctan(1 / 2 * np.tan(agent.velocity[1]))
+    # print('pre pose ',agent.position[0]+agent.velocity[0] *np.cos(agent.theta + beta)*0.02,agent.position[1]+agent.velocity[1] *np.cos(agent.theta + beta)*0.02)
+    beta=0
+
+    return  agent.velocity[0] *np.cos(agent.theta + beta), agent.velocity[0] * np.sin(agent.theta  + beta)
 
 def reward_speed(agent,control_v, t, dt, lines):
     reward = reward_point_to_lines(control_v, lines)
@@ -204,7 +208,7 @@ def control_choose(agent:Agent,rewards,actions,t):
                 min_action = actions[i]
 
 
-    print('reward ',min_reward,record_reward ,' action ',min_action)
+    # print('reward ',min_reward,record_reward ,' action ',min_action)
     # print("control choose")
     return min_action
 
@@ -247,6 +251,7 @@ def reward_point_to_lines(point,lines):
     count=0
     for line in lines:
         re=reward_point_to_line(point,line)
+        # print(re)
         if re !=0:
             count+=1
             reward+=re
@@ -271,11 +276,12 @@ def reward_point_to_line(point,line):
     if theta<=math.pi/2:
         return 0
     else:
-        if line.direction[0]!=0:
-            k=line.direction[1]/line.direction[0]
+        if line.direction[1]!=0:
+            k=-line.direction[0]/line.direction[1]
+            # print('k ',k,' pose ',x,' dir ',y,' ori ',point,' line point ',line.point)
             distant=abs(k*x[0]-x[1])/math.sqrt(k*k+1)
         else:
-            distant=abs(x[0])
+            distant=abs(x[1])
         return distant
 
 def get_avoidance_velocity(agent, collider, t, dt):

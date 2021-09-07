@@ -1,3 +1,4 @@
+import copy
 import math
 
 import numpy as np
@@ -20,10 +21,10 @@ class HighWayOrca():
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
             'vehicles_count':20,
-            'simulation_frequency': 40,
+            'simulation_frequency': 50,
             'vehicles_density': 1,
-            "policy_frequency":20,
-            "duration": 400,
+            "policy_frequency":25,
+            "duration": 1000,
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 15,
@@ -47,7 +48,7 @@ class HighWayOrca():
         self.env.reset()
         self.done = False
         self.acc = 4
-        self.tau = 5
+        self.tau = 2
         self.prev = 35
         self.lane=1
         self.lane_length=4
@@ -76,7 +77,12 @@ class HighWayOrca():
 
         steer=self.later_pid.run_step(0, 0, agent.theta, goal_x, goal_y, control_theta, now_v)
 
-        ai= self.__PControl(now_v, l)
+        ai= self.__PControl( l,now_v)
+
+        # if steer>math.pi/2:
+        #     steer=math.pi/2
+        # if steer < -math.pi / 2:
+        #     steer = -math.pi / 2
 
         action=[ai,-steer]
 
@@ -84,6 +90,14 @@ class HighWayOrca():
 
         return action
         # return [0.5,0]
+
+    def get_agent_from_obs(self,obj):
+        position=(obj[1], obj[2])
+        velocity = (obj[3], obj[4])
+        ag=Agent(position,velocity, self.car_radiu, self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5]))
+        vx,vy=pyorca.get_vxvy_from_agent(ag)
+        ag.velocity=np.array((vx,vy))
+        return ag
 
     def run(self):
 
@@ -95,6 +109,10 @@ class HighWayOrca():
             # print('action ',action, type(action))
             # print('obs ',obs)
             if self.done:
+                if info["crashed"]==True:
+                    print("crash")
+                else:
+                    print("done")
                 break
 
             agents = []
@@ -104,7 +122,7 @@ class HighWayOrca():
                     if i !=0:
                         pd=True
                 if pd:
-                    agents.append(Agent((obj[1], obj[2]), (obj[3], obj[4]), self.car_radiu, self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5])))
+                    agents.append(self.get_agent_from_obs(obj))
                     # print('pre ',obj[0],' x ',obj[1],' y ',obj[2],' vx ',obj[3],' vy ',obj[4],' cosh ',obj[5],' sinh ',obj[6] )
             # print('info ',info)
 
@@ -120,13 +138,19 @@ class HighWayOrca():
             action = self.change_vxvy_to_action(agents[0], new_vels)
             new_v=new_vels
 
+
             # action=new_vels
             # new_v=pyorca.control_v_create(agents[0],action, self.tau)
 
+            copy_env=copy.copy(self.env)
+            copy_env.render()
+            tmp_obs, tmp_reward, tmp_done, tmp_info = copy_env.step(action)
+            # print('tmp obs',tmp_obs[0])
+            # print('tmp info ',tmp_info)
             self.env.render()
             # input()
 
-            # self.draw(agents[0], agents[1:],all_line,new_v)
+            self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
@@ -161,7 +185,7 @@ class HighWayOrca():
         for line in lines:
             # print('before ',line)
             self.draw_half_line(my_agent,line)
-
+        # print('velo ',my_agent.velocity)
         # 绘制控制车辆
         self.draw_circle(my_agent, colr='black')
 
@@ -170,6 +194,10 @@ class HighWayOrca():
         plt.plot([my_agent.position[0], my_agent.position[0] + v_opt[0]],
                  [my_agent.position[1], my_agent.position[1] + v_opt[1]], color='blue')
 
+        # print(my_agent.velocity[1],np.arctan(1 / 2 * np.tan(my_agent.velocity[1])))
+        # beta = np.arctan(1 / 2 * np.tan(my_agent.velocity[1]))
+        # print('pre pose ', my_agent.position[0] + my_agent.velocity[0] * np.cos(my_agent.theta + beta) * 0.02,
+        #       my_agent.position[1] + my_agent.velocity[1] * np.cos(my_agent.theta + beta) * 0.02)
 
         # plt.show()
         plt.pause(0.01)
