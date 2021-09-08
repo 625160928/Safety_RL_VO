@@ -69,7 +69,7 @@ def orca(agent, colliding_agents, t, dt, limit=None):
 
         line = Line(agent.velocity + dv , n) #这里本来应该是个个体都要有一半的避障责任（dv/2）
         lines.append(line)
-        print('collider ',collider.position,collider.velocity,' -- to line ',agent.velocity + dv / 2, n)
+        # print('collider ',collider.position,collider.velocity,' -- to line ',agent.velocity + dv / 2, n)
     lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
     lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
     # print('limit ',limit)
@@ -85,26 +85,66 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     return speed_optimize(lines, agent,t,dt), lines
 
 def speed_optimize(lines, agent,t,dt):
-    derta_vx=1
-    derta_vy=0.3
-    acc_range_number=20
-    steer_range_number=40
     contorl_arr=[]
     reward_arr=[]
+    control_v_arr=[]
     init_vx,init_vy=get_vxvy_from_agent(agent)
-    for i in range(-acc_range_number,acc_range_number+1):
-        for j in range(-steer_range_number,steer_range_number+1):
-            tmp_vx=init_vx+i*derta_vx
-            tmp_vy=init_vy+j*derta_vy
-            tmp_reward=reward_speed(agent,[tmp_vx,tmp_vy], t, dt, lines)
-            # print('reward ',tmp_reward,' action  ',[tmp_vx,tmp_vy],i,j,' ori ',init_vx,init_vy)
-            contorl_arr.append([tmp_vx,tmp_vy])
-            reward_arr.append(tmp_reward)
+
+    control_v_arr=get_car_posiable_speed_car(agent)
+
+    for i in range(len(control_v_arr)):
+        tmp_vx=control_v_arr[i][0]
+        tmp_vy=control_v_arr[i][1]
+        tmp_reward=reward_speed(agent,[tmp_vx,tmp_vy], t, dt, lines)
+        # print('reward ',tmp_reward,' action  ',[tmp_vx,tmp_vy],i,j,' ori ',init_vx,init_vy)
+        contorl_arr.append([tmp_vx,tmp_vy])
+        reward_arr.append(tmp_reward)
 
     final_control = speed_choose(agent, reward_arr, contorl_arr, t)
     print('final reward ',reward_arr[contorl_arr.index(final_control)],' derta v control ',final_control[0]-init_vx,final_control[1]-init_vy)
     # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
     return final_control
+
+def get_car_posiable_speed_rec(agent:Agent):
+    ans=[]
+    derta_vx=1
+    derta_vy=0.3
+    acc_range_number=20
+    steer_range_number=40
+    init_vx,init_vy=get_vxvy_from_agent(agent)
+    for i in range(-acc_range_number,acc_range_number+1):
+        for j in range(-steer_range_number,steer_range_number+1):
+            tmp_vx=init_vx+i*derta_vx
+            tmp_vy=init_vy+j*derta_vy
+            ans.append([tmp_vx,tmp_vy])
+    return ans
+
+def get_car_posiable_speed_car(agent:Agent):
+    ans=[]
+    init_vx,init_vy=get_vxvy_from_agent(agent)
+    derta_vx=1
+    acc_range_number=10
+
+    max_theta=math.pi/5
+    steer_range_number=10
+
+    for i in range(-acc_range_number,acc_range_number+1):
+        for j in range(-steer_range_number,steer_range_number+1):
+            tmp_theta=j/steer_range_number*max_theta
+            ds=i*derta_vx/math.cos(tmp_theta)
+
+
+
+            tmp_vx=init_vx+ds*math.cos(agent.theta-tmp_theta)
+            tmp_vy=init_vy+ds*math.sin(agent.theta-tmp_theta)
+
+            # print('agent ',init_vx,init_vy,agent.theta,' derta  ',i*derta_vx,tmp_theta*180/math.pi,' tmp  ',[tmp_vx,tmp_vy])
+            ans.append([tmp_vx,tmp_vy])
+
+    # for i in ans:
+    #     print(i)
+    # print(ans)
+    return ans
 
 def speed_choose(agent:Agent,rewards,actions,t):
     min_coll=9999
@@ -384,12 +424,12 @@ def get_avoidance_velocity(agent, collider, t, dt):
         # velocity that will get us out of the collision within the next
         # timestep.
         print("intersecting")
-        w = v - x/dt
+        w = -v - x/dt
         u = (normalized(w) * r/dt - w)
         n =( normalized(w))
-        # if 1:
-        #     u=-u
-        #     n=-n
+        if 1:
+            u=w
+            n=normalized(-x)
     return u, n
 
 def norm_sq(x):

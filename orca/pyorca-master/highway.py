@@ -41,21 +41,21 @@ class HighWayOrca():
                 "type": "ContinuousAction"
             }
         }
-
-        self.env.seed(10)
+        self.fresh_speed=False
+        self.env.seed(11)
         self.env.configure(config)
         self.env.reset()
         self.done = False
         self.acc = 4
         self.tau = 2
         self.dt=0.05
-        self.prev = 35
+        self.prev = 25
         self.lane=1
         self.lane_length=4
 
         # 速度P控制器系数 1
         self.Speed_Kp = 0.03
-        self.car_radiu=3.5
+        self.car_radiu=3
 
         self.edge_remain=0.2
 
@@ -92,7 +92,15 @@ class HighWayOrca():
 
         action=[ai,-steer]
 
-        print('pose ',agent.position,agent.theta*180/math.pi,' now_speed ',agent.velocity,'pre-v',agent.pref_velocity,'orca-v',control_v,'action ',action)
+        limit_control=7
+        if control_v[0]<agent.velocity[0]-limit_control:
+            print('emergy speed down')
+            action[0]=-1
+        if control_v[0]>agent.velocity[0]+limit_control:
+            print('emergy speed up')
+            action[0]=1
+        print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
+              agent.pref_velocity, 'orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]
@@ -124,8 +132,10 @@ class HighWayOrca():
                 break
 
             agents = []
+            new_speed=0
             for obj in obs:
                 pd=False
+                new_speed+=obj[3]
                 for i in obj:
                     if i !=0:
                         pd=True
@@ -133,6 +143,11 @@ class HighWayOrca():
                     agents.append(self.get_agent_from_obs(obj))
                     # print('pre ',obj[0],' x ',obj[1],' y ',obj[2],' vx ',obj[3],' vy ',obj[4],' cosh ',obj[5],' sinh ',obj[6] )
             # print('info ',info)
+            if self.fresh_speed:
+                new_speed=new_speed/len(obs)
+                if new_speed!=0:
+                    int(new_speed)
+                    self.prev=new_speed+5
 
             # 设置目标速度，换道决策
             agents[0].pref_velocity = self.set_pref_v(agents[0].position[0], agents[0].position[1],
@@ -151,8 +166,9 @@ class HighWayOrca():
             # new_v=pyorca.control_v_create(agents[0],action, self.tau)
             self.env.render()
             # input()
-
-            if count>=311:
+            # if count==197:
+            #     input()
+            if count>=0:
                 self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
@@ -202,8 +218,8 @@ class HighWayOrca():
         # print('pre pose ', my_agent.position[0] + my_agent.velocity[0] * np.cos(my_agent.theta + beta) * 0.02,
         #       my_agent.position[1] + my_agent.velocity[1] * np.cos(my_agent.theta + beta) * 0.02)
 
-        plt.show()
-        # plt.pause(0.01)
+        # plt.show()
+        plt.pause(0.01)
         # input()
 
     def draw_circle(self, agent, colr="r"):
