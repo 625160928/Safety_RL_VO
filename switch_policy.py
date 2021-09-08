@@ -1,6 +1,7 @@
 import copy
 import math
 
+import numpy
 import numpy as np
 import gym
 import highway_env
@@ -19,9 +20,16 @@ class SwitchLogic():
         self.car_steer_limit = math.pi / 3
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
+        self.dt=0.05
+        self.done = False
+        self.orca_policy=HighWayOrca()
+        self.tau = 2
+        self.prev = 25
+        self.env.seed(11)
+        self.switch_danger_theta=math.pi/6
         config = {
             'vehicles_count': 20,
-            'simulation_frequency': 20,
+            'simulation_frequency': 1/self.dt,
             'vehicles_density': 1,
             "policy_frequency": 10,
             "duration": 1000,
@@ -43,14 +51,8 @@ class SwitchLogic():
                 "type": "ContinuousAction"
             }
         }
-        self.env.seed(11)
         self.env.configure(config)
         self.env.reset()
-        self.done = False
-        self.orca_policy=HighWayOrca()
-        self.tau = 2
-        self.dt=0.05
-        self.prev = 25
 
     #et orca action from orca
     def get_orca_action(self,obs):
@@ -78,7 +80,7 @@ class SwitchLogic():
 
         # 将速度转换为动作指令
         action = self.orca_policy.change_vxvy_to_action(agents[0], new_vels)
-        return action
+        return action,new_vels
 
     def get_rl_action(self,obs):
         return (0,0)
@@ -86,8 +88,20 @@ class SwitchLogic():
     def env_predict(self,action,obs,t):
         return obs
 
-    def danger_action(self,action1,action2):
-        return True
+
+    def danger_action(self,env_obs,orca_speed):
+        position_sin_theta=env_obs[0][6]
+        position_cos_theta=env_obs[0][5]
+
+        a=math.hypot(position_cos_theta,position_sin_theta)
+        b=math.hypot(orca_speed[0],orca_speed[1])
+        c=math.hypot(orca_speed[0]-position_cos_theta,orca_speed[1]-position_sin_theta)
+
+        derta_cos_theta=(a*a+b*b-c*c)/(2*a*b)
+        derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
+        if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
+            return True
+        return False
 
     def run(self):
         count = 0
@@ -114,16 +128,15 @@ class SwitchLogic():
             predict_env_obs=self.env_predict(rl_action,obs,self.tau)
 
             #get action in predict env and check, whether action is danger
-            predict_orca_action = self.get_orca_action(predict_env_obs)
-            predict_rl_action = self.get_rl_action(predict_env_obs)
+            predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
 
-            if self.danger_action(predict_rl_action,predict_orca_action):
+            if self.danger_action(predict_env_obs,pre_vel_speed):
                 print('danger, choose ORCA action')
-                action=self.get_orca_action(obs)
+                action,vel_speed=self.get_orca_action(obs)
             else:
                 print('save, choose RL action')
                 action=rl_action
-
+            print('final action is ',action)
             self.env.render()
 
 

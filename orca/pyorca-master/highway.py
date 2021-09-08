@@ -99,8 +99,8 @@ class HighWayOrca():
         if control_v[0]>agent.velocity[0]+limit_control:
             print('emergy speed up')
             action[0]=1
-        print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
-              agent.pref_velocity, 'orca-v', control_v, 'action ', action)
+        # print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
+        #       agent.pref_velocity, 'orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]

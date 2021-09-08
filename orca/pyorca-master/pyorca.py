@@ -101,7 +101,7 @@ def speed_optimize(lines, agent,t,dt):
         reward_arr.append(tmp_reward)
 
     final_control = speed_choose(agent, reward_arr, contorl_arr, t)
-    print('final reward ',reward_arr[contorl_arr.index(final_control)],' derta v control ',final_control[0]-init_vx,final_control[1]-init_vy)
+    # print('final reward ',reward_arr[contorl_arr.index(final_control)],' derta v control ',final_control[0]-init_vx,final_control[1]-init_vy)
     # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
     return final_control
 
