@@ -75,7 +75,7 @@ def draw_orca_circles(a, b):
 def draw_velocity(a):
     pygame.draw.line(screen, pygame.Color(0, 255, 255), rint(a.position * scale + O).astype(int), rint((a.position + a.velocity) * scale + O).astype(int), 1)
     # pygame.draw.line(screen, pygame.Color(255, 0, 255), rint(a.position * scale + O).astype(int), rint((a.position + a.pref_velocity) * scale + O).astype(int), 1)
-
+print('dt ',dt)
 running = True
 accum = 0
 all_lines = [[]] * len(agents)

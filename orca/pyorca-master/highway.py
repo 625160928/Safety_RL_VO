@@ -14,16 +14,14 @@ from controller import pid_lateral_controller_angle
 
 class HighWayOrca():
     def __init__(self):
-        self.dt=2
         self.car_steer_limit=math.pi/3
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.3, K_D=0.0, K_I=0.0)
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
             'vehicles_count':20,
-            'simulation_frequency': 50,
+            'simulation_frequency': 20,
             'vehicles_density': 1,
-            "policy_frequency":25,
+            "policy_frequency":10,
             "duration": 1000,
             "observation": {
                 "type": "Kinematics",
@@ -44,17 +42,25 @@ class HighWayOrca():
             }
         }
 
+        self.env.seed(10)
         self.env.configure(config)
         self.env.reset()
         self.done = False
         self.acc = 4
         self.tau = 2
+        self.dt=0.05
         self.prev = 35
         self.lane=1
         self.lane_length=4
+
         # 速度P控制器系数 1
         self.Speed_Kp = 0.03
         self.car_radiu=3.5
+
+        self.edge_remain=0.2
+
+
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.35, K_D=0.1, K_I=0.0)
 
 
 
@@ -100,12 +106,14 @@ class HighWayOrca():
         return ag
 
     def run(self):
-
+        count=0
         action = (0, 0)
         while not self.done:
+            count+=1
             # action =env.action_space.sample()
             obs, reward, self.done, info = self.env.step(action)
             print('---------------------------------------------')
+            print('run count ',count)
             # print('action ',action, type(action))
             # print('obs ',obs)
             if self.done:
@@ -132,7 +140,7 @@ class HighWayOrca():
             # print('pose ',agents[0].position,' theta ',theta*180/math.pi,math.sin(theta))
 
             # 计算orca避障速度
-            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2,14-agents[0].radius/2])
+            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
 
             # 将速度转换为动作指令
             action = self.change_vxvy_to_action(agents[0], new_vels)
@@ -141,16 +149,11 @@ class HighWayOrca():
 
             # action=new_vels
             # new_v=pyorca.control_v_create(agents[0],action, self.tau)
-
-            copy_env=copy.copy(self.env)
-            copy_env.render()
-            tmp_obs, tmp_reward, tmp_done, tmp_info = copy_env.step(action)
-            # print('tmp obs',tmp_obs[0])
-            # print('tmp info ',tmp_info)
             self.env.render()
             # input()
 
-            self.draw(agents[0], agents[1:],all_line,new_v)
+            if count>=311:
+                self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
@@ -199,8 +202,8 @@ class HighWayOrca():
         # print('pre pose ', my_agent.position[0] + my_agent.velocity[0] * np.cos(my_agent.theta + beta) * 0.02,
         #       my_agent.position[1] + my_agent.velocity[1] * np.cos(my_agent.theta + beta) * 0.02)
 
-        # plt.show()
-        plt.pause(0.01)
+        plt.show()
+        # plt.pause(0.01)
         # input()
 
     def draw_circle(self, agent, colr="r"):

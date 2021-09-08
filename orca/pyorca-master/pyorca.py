@@ -39,6 +39,9 @@ from halfplaneintersect import halfplane_optimize, Line, perp
 # For each such velocity 'u' and normal 'n', find half-plane as defined in (6).
 # Intersect half-planes and pick velocity closest to A's preferred velocity.
 
+save_dis=1.5
+save_reward=0.5
+
 class Agent(object):
     """A disk-shaped agent."""
     def __init__(self, position, velocity, radius, max_speed, pref_velocity,theta=None):
@@ -63,9 +66,10 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     for collider in colliding_agents:
         # print(collider)
         dv, n = get_avoidance_velocity(agent, collider, t, dt)
-        line = Line(agent.velocity + dv / 2, n)
+
+        line = Line(agent.velocity + dv , n) #这里本来应该是个个体都要有一半的避障责任（dv/2）
         lines.append(line)
-        # print('rela ',collider.position,collider.velocity,' -- ',agent.velocity + dv / 2, n)
+        print('collider ',collider.position,collider.velocity,' -- to line ',agent.velocity + dv / 2, n)
     lines.append( Line([0,limit[0]-agent.position[1]], [0,1]))
     lines.append( Line([0,limit[1]-agent.position[1]], [0,-1]))
     # print('limit ',limit)
@@ -81,10 +85,10 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     return speed_optimize(lines, agent,t,dt), lines
 
 def speed_optimize(lines, agent,t,dt):
-    derta_vx=0.6
+    derta_vx=1
     derta_vy=0.3
     acc_range_number=20
-    steer_range_number=20
+    steer_range_number=40
     contorl_arr=[]
     reward_arr=[]
     init_vx,init_vy=get_vxvy_from_agent(agent)
@@ -107,8 +111,8 @@ def speed_choose(agent:Agent,rewards,actions,t):
     for i in range(len(rewards)):
         if rewards[i][0]<min_coll:
             min_coll=rewards[i][0]
-    w_speed=0.15
-    w_orca=0.65
+    w_speed=0.2
+    w_orca=0.6
     w_rank=0.2
 
     min_reward=99999
@@ -252,9 +256,9 @@ def reward_point_to_lines(point,lines):
     for line in lines:
         re=reward_point_to_line(point,line)
         # print(re)
-        if re !=0:
+        if re >save_dis*save_reward:
             count+=1
-            reward+=re
+        reward+=re
     return [count,reward]
 
 def reward_point_to_line(point,line):
@@ -274,7 +278,18 @@ def reward_point_to_line(point,line):
     theta=math.atan2(math.sqrt(1-cos_angle*cos_angle ),cos_angle)
     # print(theta/math.pi*180)
     if theta<=math.pi/2:
-        return 0
+        if line.direction[1]!=0:
+            k=-line.direction[0]/line.direction[1]
+            # print('k ',k,' pose ',x,' dir ',y,' ori ',point,' line point ',line.point)
+            distant=abs(k*x[0]-x[1])/math.sqrt(k*k+1)
+        else:
+            distant=abs(x[1])
+
+        if distant>=save_dis:
+            return 0
+        else:
+            return save_reward*(save_dis-distant)
+
     else:
         if line.direction[1]!=0:
             k=-line.direction[0]/line.direction[1]
@@ -282,7 +297,7 @@ def reward_point_to_line(point,line):
             distant=abs(k*x[0]-x[1])/math.sqrt(k*k+1)
         else:
             distant=abs(x[1])
-        return distant
+        return distant+save_reward*save_dis
 
 def get_avoidance_velocity(agent, collider, t, dt):
     """Get the smallest relative change in velocity between agent and collider
@@ -368,10 +383,13 @@ def get_avoidance_velocity(agent, collider, t, dt):
         # We're already intersecting. Pick the closest velocity to our
         # velocity that will get us out of the collision within the next
         # timestep.
-        # print("intersecting")
+        print("intersecting")
         w = v - x/dt
-        u = normalized(w) * r/dt - w
-        n = normalized(w)
+        u = (normalized(w) * r/dt - w)
+        n =( normalized(w))
+        # if 1:
+        #     u=-u
+        #     n=-n
     return u, n
 
 def norm_sq(x):
