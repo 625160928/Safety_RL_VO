@@ -87,7 +87,7 @@ while running:
 
         new_vels = [None] * len(agents)
         for i, agent in enumerate(agents):
-            # print(i, agent)
+            print(i, agent)
             candidates = agents[:i] + agents[i + 1:]
             # print(candidates)
             new_vels[i], all_lines[i] = orca(agent, candidates, tau, dt,[-20,20])
