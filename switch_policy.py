@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from halfplaneintersect import Line
 from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp
+
 import pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
@@ -20,6 +21,7 @@ class SwitchLogic():
         self.car_steer_limit = math.pi / 3
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
+        self.policy_frequency=10
         self.dt=0.05
         self.done = False
         self.orca_policy=HighWayOrca()
@@ -27,11 +29,14 @@ class SwitchLogic():
         self.prev = 25
         self.env.seed(11)
         self.switch_danger_theta=math.pi/6
+        self.predict_time=1
+        self.pose=[]
+        self.pred=[]
         config = {
             'vehicles_count': 20,
             'simulation_frequency': 1/self.dt,
             'vehicles_density': 1,
-            "policy_frequency": 10,
+            "policy_frequency": self.policy_frequency,
             "duration": 1000,
             "observation": {
                 "type": "Kinematics",
@@ -85,8 +90,21 @@ class SwitchLogic():
     def get_rl_action(self,obs):
         return (0,0)
 
-    def env_predict(self,action,obs,t):
-        return obs
+    def env_predict(self,action,obs,t,time):
+        update_predit_time=self.predict_time*(1/self.dt)/self.policy_frequency
+        pre_obs_arr=[]
+        # print(time+self.predict_time)
+        for vehicle in self.env.road.vehicles:
+            for obj in obs:
+                if obj[1]==vehicle.position[0] and obj[2]==vehicle.position[1]:
+                    pre_obj=vehicle.predict_trajectory_constant_speed([update_predit_time])
+                    # print(pre_obj[0][0][0],pre_obj[1])
+                    pre_obs=[1,pre_obj[0][0][0],pre_obj[0][0][1],obj[3],obj[4],math.cos(pre_obj[1][0]),math.sin(pre_obj[1][0])]
+                    print(pre_obs)
+                    pre_obs_arr.append(pre_obs)
+        # print(len(obs),len(pre_obs_arr),len(obs[0]),len(pre_obs_arr[0]))
+
+        return pre_obs_arr
 
 
     def danger_action(self,env_obs,orca_speed):
@@ -101,17 +119,21 @@ class SwitchLogic():
         derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
         if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
             return True
+        # return True
         return False
 
     def run(self):
         count = 0
         action = (0, 0)
         while not self.done:
+            print('---------------------------------------------')
             count += 1
+            print('run count ', count,"  time = ",count*self.dt)
+            print('final action is ',action)
             # action =env.action_space.sample()
             obs, reward, self.done, info = self.env.step(action)
-            print('---------------------------------------------')
-            print('run count ', count)
+            self.pose.append([count*self.dt,[obs[0][1],obs[0][2]]])
+            print("now pose is ",obs[0][1],obs[0][2],' speed is ',[obs[0][3],obs[0][4]])
             # print('action ',action, type(action))
             # print('obs ',obs)
             if self.done:
@@ -125,7 +147,7 @@ class SwitchLogic():
             rl_action=self.get_rl_action(obs)
 
             #predict env at time=self.tau later
-            predict_env_obs=self.env_predict(rl_action,obs,self.tau)
+            predict_env_obs=self.env_predict(rl_action,obs,self.tau,count*self.dt)
 
             #get action in predict env and check, whether action is danger
             predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
@@ -136,9 +158,16 @@ class SwitchLogic():
             else:
                 print('save, choose RL action')
                 action=rl_action
-            print('final action is ',action)
-            self.env.render()
 
+            self.env.render()
+        print('----------------------------------------------------------')
+        diff=int( self.predict_time/self.dt)
+        print(diff)
+        for i in range(len(self.pose)):
+            if i-diff<0:
+                continue
+            else:
+                print(self.pose[i][1],' --- ',self.pred[i-diff][1])
 
 
 
