@@ -6,8 +6,7 @@ import gym
 import highway_env
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from halfplaneintersect import Line
-from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp
+from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp,Line
 import pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
@@ -109,8 +108,10 @@ class HighWayOrca():
         position=(obj[1], obj[2])
         velocity = (obj[3], obj[4])
         ag=Agent(position,velocity, self.car_radiu, self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5]))
+        print('obs 1',ag.velocity)
         vx,vy=pyorca.get_vxvy_from_agent(ag)
         ag.velocity=np.array((vx,vy))
+        print('obs 2',ag.velocity)
         return ag
 
     def run(self):

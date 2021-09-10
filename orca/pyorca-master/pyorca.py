@@ -30,7 +30,6 @@ from numpy import array, sqrt, copysign, dot
 from numpy.linalg import det
 import numpy as np
 
-from halfplaneintersect import halfplane_optimize, Line, perp
 
 # Method:
 # For each robot A and potentially colliding robot B, compute smallest change
@@ -53,6 +52,16 @@ class Agent(object):
         self.pref_velocity = array(pref_velocity)
         self.theta=theta
 
+class Line(object):
+    """A line in space."""
+    def __init__(self, point, direction):
+        super(Line, self).__init__()
+        self.point = array(point)
+        self.direction = normalized(array(direction))
+
+    def __repr__(self):
+        return "Line(%s, %s)" % (self.point, self.direction)
+
 limit_range=[-20,34]
 
 def orca(agent, colliding_agents, t, dt, limit=None):
@@ -62,6 +71,8 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     # print('orca ',colliding_agents)
     if limit is None:
         limit = limit_range
+    else:
+        limit_range=limit
     lines = []
     for collider in colliding_agents:
         # print(collider)
@@ -105,6 +116,9 @@ def speed_optimize(lines, agent,t,dt):
     # print('action ',final_control,' pre ',control_v_create(agent, final_control, t))
     return final_control
 
+def perp(a):
+    return array((a[1], -a[0]))
+
 def get_car_posiable_speed_rec(agent:Agent):
     ans=[]
     derta_vx=1
@@ -121,7 +135,10 @@ def get_car_posiable_speed_rec(agent:Agent):
 
 def get_car_posiable_speed_car(agent:Agent):
     ans=[]
-    init_vx,init_vy=get_vxvy_from_agent(agent)
+    # init_vx,init_vy=get_vxvy_from_agent(agent)
+    init_vx=agent.velocity[0]
+    init_vy=agent.velocity[1]
+
     derta_vx=1
     acc_range_number=10
 
@@ -424,12 +441,13 @@ def get_avoidance_velocity(agent, collider, t, dt):
         # velocity that will get us out of the collision within the next
         # timestep.
         print("intersecting")
+        # w = -v - x/dt
+        # u = (normalized(w) * r/dt - w)
+        # n =( normalized(w))
+        # if 1:
         w = -v - x/dt
-        u = (normalized(w) * r/dt - w)
-        n =( normalized(w))
-        if 1:
-            u=w
-            n=normalized(-x)
+        u=w
+        n=normalized(-x)
     return u, n
 
 def norm_sq(x):
