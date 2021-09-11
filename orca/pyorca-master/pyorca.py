@@ -141,7 +141,7 @@ def get_car_posiable_speed_car(agent:Agent):
     init_vx=agent.velocity[0]
     init_vy=agent.velocity[1]
 
-    derta_vx=1
+    derta_vx=0.3
     acc_range_number=10
 
     max_theta=math.pi/5
@@ -170,9 +170,9 @@ def speed_choose(agent:Agent,rewards,actions,t):
     for i in range(len(rewards)):
         if rewards[i][0]<min_coll:
             min_coll=rewards[i][0]
-    w_speed=0.2
-    w_orca=0.6
-    w_rank=0.2
+    w_speed=0.25
+    w_orca=0.65
+    w_rank=0.1
 
     min_reward=99999
     min_action=[]
@@ -487,7 +487,7 @@ def get_car_aciliable_speed(collider:Agent,t,limit):
     houxuan=collider.radius*2/4
     up_range=limit[1]
     down_range=limit[0]
-    min_turning_radiu=10
+    min_turning_radiu=15
     # print('collider.theta ',collider.theta)
 
     s_max=collider.velocity[0]*t+1/2*collider.max_speed*t*t
@@ -531,8 +531,14 @@ def get_car_aciliable_speed(collider:Agent,t,limit):
     down_theta_limit=min(o_down_theta,speedmax_theta)
 
     #zuo you bian ti xing de chang du
-    up_l=[(collider.velocity[0]-collider.max_speed*t),(collider.velocity[0]+collider.max_speed*t)/math.cos(up_theta_limit)]
-    down_l=[(collider.velocity[0]-collider.max_speed*t),(collider.velocity[0]+collider.max_speed*t)/math.cos(down_theta_limit)]
+    if collider.velocity[0]-collider.max_speed*t>0:
+        down_l = [(collider.velocity[0] - collider.max_speed * t),
+                  (collider.velocity[0] + collider.max_speed * t) / math.cos(down_theta_limit)]
+        up_l=[(collider.velocity[0]-collider.max_speed*t),(collider.velocity[0]+collider.max_speed*t)/math.cos(up_theta_limit)]
+    else:
+        up_l=[0,(collider.velocity[0]+collider.max_speed*t)/math.cos(up_theta_limit)]
+
+        down_l=[0,(collider.velocity[0]+collider.max_speed*t)/math.cos(down_theta_limit)]
 
     v0=[math.cos(collider.theta),math.sin(collider.theta)]
 

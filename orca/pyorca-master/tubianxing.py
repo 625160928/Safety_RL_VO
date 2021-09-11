@@ -13,6 +13,15 @@ def SubPoint(point1, point2):
 def CrossProduct(point1, point2):
     return point1[0] * point2[1] - point1[1] * point2[0]
 
+#Pan duan shi fou shun shi zhen
+def IsDisOrder(rec):
+    v1=[rec[1][0]-rec[0][0],rec[1][1]-rec[0][1]]
+    v2=[rec[2][0]-rec[1][0],rec[2][1]-rec[1][1]]
+    # print('is order ',CrossProduct(v1,v2))
+    if CrossProduct(v1,v2)>0:
+        return True
+    return False
+
 def IsPointInConvexPolygon(pointlst, targetp):
     length = len(pointlst)
     if length == 0:

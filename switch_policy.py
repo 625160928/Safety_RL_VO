@@ -32,7 +32,7 @@ class SwitchLogic():
         self.pose=[]
         self.pred=[]
         config = {
-            'vehicles_count': 20,
+            'vehicles_count': 30,
             'simulation_frequency': 1/self.dt,
             'vehicles_density': 1,
             "policy_frequency": self.policy_frequency,

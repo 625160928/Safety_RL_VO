@@ -17,9 +17,9 @@ class HighWayOrca():
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         config = {
-            'vehicles_count':20,
+            'vehicles_count':30,
             'simulation_frequency': 20,
-            'vehicles_density': 1,
+            'vehicles_density': 1.3,
             "policy_frequency":10,
             "duration": 1000,
             "observation": {
@@ -45,7 +45,7 @@ class HighWayOrca():
         self.env.configure(config)
         self.env.reset()
         self.done = False
-        self.acc = 4
+        self.acc = 1
         self.tau = 2
         self.dt=0.05
         self.prev = 25
@@ -53,13 +53,13 @@ class HighWayOrca():
         self.lane_length=4
 
         # 速度P控制器系数 1
-        self.Speed_Kp = 0.03
+        self.Speed_Kp = 0.6
         self.car_radiu=3
 
         self.edge_remain=0.2
 
 
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.35, K_D=0.1, K_I=0.0)
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.4, K_D=0.1, K_I=0.0)
 
 
 
@@ -98,8 +98,8 @@ class HighWayOrca():
         if control_v[0]>agent.velocity[0]+limit_control:
             print('emergy speed up')
             action[0]=1
-        # print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
-        #       agent.pref_velocity, 'orca-v', control_v, 'action ', action)
+        print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
+              agent.pref_velocity, 'orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]
@@ -171,7 +171,53 @@ class HighWayOrca():
             # if count==197:
             #     input()
             if count>=0:
+                # for i in range(1,len(agents)):
+                #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
+
                 self.draw(agents[0], agents[1:],all_line,new_v)
+
+    def draw_orca_collider(self,agent, collider, t, dt,limit):
+        import draw_picture
+
+        x = -(agent.position - collider.position)
+        r = agent.radius + collider.radius
+
+        x_len_sq = pyorca.norm_sq(x)
+
+        if x_len_sq >= r * r:
+            print('agent ',agent.position,agent.velocity,' collider',collider.position,collider.velocity)
+            collider_aviliable_speed_set=pyorca.get_car_aciliable_speed(collider,t,limit)
+            unino_agent_collide_speed_set=pyorca.get_agent_collide_set(agent,collider,t)
+            agent_collide_set=pyorca.Minkowski.Minkowski_sum(collider_aviliable_speed_set,unino_agent_collide_speed_set)
+            u,n=pyorca.get_dv_n_from_tubianxing(agent.velocity,agent_collide_set)
+
+            print(collider_aviliable_speed_set)
+            print(unino_agent_collide_speed_set)
+
+
+            plt.figure(num='orca')
+            plt.clf()
+            # 画图
+            x_major_locator = MultipleLocator(10)
+            y_major_locator = MultipleLocator(10)
+            ax = plt.gca()# ax为两条坐标轴的实例
+            ax.xaxis.set_major_locator(x_major_locator)
+            # 把x轴的主刻度设置为1的倍数
+            ax.yaxis.set_major_locator(y_major_locator)
+
+
+            for i in range(len(collider_aviliable_speed_set)):
+                collider_aviliable_speed_set[i]+=x
+
+            plt.scatter(0,0,color='red')
+            plt.scatter(x[0],x[1],color='blue')
+            draw_picture.draw_tubianxing(collider_aviliable_speed_set,color='blue')
+            draw_picture.draw_tubianxing(unino_agent_collide_speed_set,color='red')
+            draw_picture.draw_tubianxing(agent_collide_set,color='black')
+            plt.show()
+
+
+        return
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
