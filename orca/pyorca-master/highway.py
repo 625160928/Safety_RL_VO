@@ -107,11 +107,12 @@ class HighWayOrca():
     def get_agent_from_obs(self,obj):
         position=(obj[1], obj[2])
         velocity = (obj[3], obj[4])
-        ag=Agent(position,velocity, self.car_radiu, self.tau * self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5]))
-        print('obs 1',ag.velocity)
+
+        ag=Agent(position,velocity, self.car_radiu,  self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5]))
+        # if math.atan2(obj[6],obj[5])!=0:
+        #     print('obj ', obj, '  theta ', math.atan2(obj[6], obj[5]))
         vx,vy=pyorca.get_vxvy_from_agent(ag)
         ag.velocity=np.array((vx,vy))
-        print('obs 2',ag.velocity)
         return ag
 
     def run(self):

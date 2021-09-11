@@ -29,8 +29,8 @@ import numpy
 from numpy import array, sqrt, copysign, dot
 from numpy.linalg import det
 import numpy as np
-
-
+import tubianxing
+import Minkowski
 # Method:
 # For each robot A and potentially colliding robot B, compute smallest change
 # in relative velocity 'u' that avoids collision. Find normal 'n' to VO at that
@@ -76,7 +76,9 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     lines = []
     for collider in colliding_agents:
         # print(collider)
-        dv, n = get_avoidance_velocity(agent, collider, t, dt)
+
+        # dv, n = get_avoidance_velocity(agent, collider, t, dt)
+        dv, n = get_car_orca_avoidance_velocity(agent, collider, t, dt,limit)
 
         line = Line(agent.velocity + dv , n) #这里本来应该是个个体都要有一半的避障责任（dv/2）
         lines.append(line)
@@ -450,6 +452,124 @@ def get_avoidance_velocity(agent, collider, t, dt):
         n=normalized(-x)
     return u, n
 
+
+def get_car_orca_avoidance_velocity(agent, collider, t, dt,limit):
+
+
+    x = -(agent.position - collider.position)
+    v = agent.velocity - collider.velocity
+    r = agent.radius + collider.radius
+
+    x_len_sq = norm_sq(x)
+
+    if x_len_sq >= r * r:
+        collider_aviliable_speed_set=get_car_aciliable_speed(collider,t,limit)
+        unino_agent_collide_speed_set=get_agent_collide_set(agent,collider,t)
+        agent_collide_set=Minkowski.Minkowski_sum(collider_aviliable_speed_set,unino_agent_collide_speed_set)
+        u,n=get_dv_n_from_tubianxing(agent.velocity,agent_collide_set)
+
+
+    else:
+        # We're already intersecting. Pick the closest velocity to our
+        # velocity that will get us out of the collision within the next
+        # timestep.
+        print("intersecting")
+        # w = -v - x/dt
+        # u = (normalized(w) * r/dt - w)
+        # n =( normalized(w))
+        # if 1:
+        w = -v - x/dt
+        u=w
+        n=normalized(-x)
+    return u, n
+
+def get_car_aciliable_speed(collider:Agent,t,limit):
+    houxuan=collider.radius*2/4
+    up_range=limit[1]
+    down_range=limit[0]
+    min_turning_radiu=10
+    # print('collider.theta ',collider.theta)
+
+    s_max=collider.velocity[0]*t+1/2*collider.max_speed*t*t
+    speedmax_theta=s_max/min_turning_radiu
+
+    #求车辆朝着y值增加的方向转弯所能转过的最大角
+    o_up=[collider.position[0]-min_turning_radiu*math.sin(collider.theta),collider.position[1]+min_turning_radiu*math.cos(collider.theta)]
+    if o_up[1]>up_range:
+        o_up_turn_cos_theta=(o_up[1]-up_range)/min_turning_radiu
+        if o_up_turn_cos_theta>1:
+            o_up_turn_cos_theta=1
+        if o_up_turn_cos_theta<-1:
+            o_up_turn_cos_theta=-1
+        o_up_theta=math.acos(o_up_turn_cos_theta)-collider.theta
+    else:
+        o_up_turn_cos_theta=(up_range-o_up[1])/min_turning_radiu
+        if o_up_turn_cos_theta>1:
+            o_up_turn_cos_theta=1
+        if o_up_turn_cos_theta<-1:
+            o_up_turn_cos_theta=-1
+        o_up_theta=math.pi-math.acos(o_up_turn_cos_theta)-collider.theta
+
+    up_theta_limit=min(o_up_theta,speedmax_theta)
+
+    #求车辆朝着y值ecreace的方向转弯所能转过的最大角
+    o_down=[collider.position[0]+min_turning_radiu*math.sin(collider.theta),collider.position[1]-min_turning_radiu*math.cos(collider.theta)]
+    if o_down[1]<down_range:
+        o_down_turn_cos_theta=(down_range-o_down[1])/min_turning_radiu
+        if o_down_turn_cos_theta>1:
+            o_down_turn_cos_theta=1
+        if o_down_turn_cos_theta<-1:
+            o_down_turn_cos_theta=-1
+        o_down_theta=math.acos(o_down_turn_cos_theta)+collider.theta
+    else:
+        o_down_turn_cos_theta=-(down_range-o_down[1])/min_turning_radiu
+        if o_down_turn_cos_theta>1:
+            o_down_turn_cos_theta=1
+        if o_down_turn_cos_theta<-1:
+            o_down_turn_cos_theta=-1
+        o_down_theta=math.pi-math.acos(o_down_turn_cos_theta)+collider.theta
+    down_theta_limit=min(o_down_theta,speedmax_theta)
+
+    #zuo you bian ti xing de chang du
+    up_l=[(collider.velocity[0]-collider.max_speed*t),(collider.velocity[0]+collider.max_speed*t)/math.cos(up_theta_limit)]
+    down_l=[(collider.velocity[0]-collider.max_speed*t),(collider.velocity[0]+collider.max_speed*t)/math.cos(down_theta_limit)]
+
+    v0=[math.cos(collider.theta),math.sin(collider.theta)]
+
+    v_up=np.array([v0[0]*math.cos(up_theta_limit)-v0[1]*math.sin(up_theta_limit),v0[0]*math.sin(up_theta_limit)+v0[1]*math.cos(up_theta_limit)])
+    v_down=np.array([v0[0]*math.cos(down_theta_limit)+v0[1]*math.sin(down_theta_limit),-v0[0]*math.sin(down_theta_limit)+v0[1]*math.cos(down_theta_limit)])
+
+    v_up=normalized(v_up)
+    v_down=normalized(v_down)
+
+    return [v_up*up_l[0],v_up*up_l[1],down_l[1]*v_down,down_l[0]*v_down]
+
+def get_agent_collide_set(agent,collider,t):
+    max_dis=100
+    x = -(agent.position - collider.position)
+    v = agent.velocity - collider.velocity
+    r = agent.radius + collider.radius
+    len_x=sqrt(norm_sq(x))
+
+
+    sin_theta=r/len_x
+    if sin_theta>1:
+        sin_theta=1
+    if sin_theta<-1:
+        sin_theta=-1
+    derta_theta=math.asin(sin_theta)
+    cos_theta=math.cos(derta_theta)
+    l=(len_x-r)/t/cos_theta
+    norm_x=normalized(x)
+    v1=np.array([norm_x[0]*cos_theta-norm_x[1]*sin_theta,norm_x[0]*sin_theta+norm_x[1]*cos_theta])
+    v2=np.array([norm_x[0]*cos_theta+norm_x[1]*sin_theta,-norm_x[0]*sin_theta+norm_x[1]*cos_theta])
+
+
+
+
+    return [v1*l,v1*max_dis,v2*max_dis,v2*l]
+
+
 def norm_sq(x):
     return dot(x, x)
 
@@ -462,6 +582,27 @@ def dist_sq(a, b):
     return norm_sq(b - a)
 
 
+
+def get_dv_n_from_tubianxing(point,points_list):
+    proj_point,seg=tubianxing.get_min_point_in_tubianxing(point,points_list)
+    in_tubianxing=tubianxing.IsPointInConvexPolygon(points_list,point)
+    dv=np.array([proj_point[0]-point[0],proj_point[1]-point[1]])
+    n=normalized(perp(np.array([seg[1][0]-seg[0][0],seg[1][1]-seg[0][1]])))
+    theta=abs(math.atan2(dv[1],dv[0])-math.atan2(n[1],n[0]))
+    if in_tubianxing==True and theta>math.pi/2:
+        n=-n
+
+    if in_tubianxing==False and theta<math.pi/2:
+        n=-n
+
+    return dv,n
+
 if __name__ == '__main__':
     # print(reward_point_to_line(point=[0,10],line=Line([0,0],[-1,-1])))
-    control_potimize(0,0,0,0)
+    # control_potimize(0,0,0,0)
+
+    c=[[-7, 10], [-9, 8], [-7, 5], [-4, 3], [-1, 3], [1, 6], [1, 7], [0.5, 8], [-1.0, 10]]
+    check_point=[3,10]
+    # get_dv_n_from_tubianxing(check_point,c)
+    # print()
+    get_dv_n_from_tubianxing(check_point,c)
