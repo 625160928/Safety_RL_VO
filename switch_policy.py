@@ -7,12 +7,12 @@ import gym
 import highway_env
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp, Line
+from car_orca.pyorca_master.pyorca import Agent, get_avoidance_velocity, orca, normalized, perp, Line
 
-import pyorca
+import car_orca.pyorca_master.pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
-from highway import HighWayOrca
+from car_orca.pyorca_master.highway import HighWayOrca
 
 class SwitchLogic():
     def __init__(self):
@@ -58,7 +58,7 @@ class SwitchLogic():
         self.env.configure(config)
         self.env.reset()
 
-    #et orca action from orca
+    #et car_orca action from car_orca
     def get_orca_action(self,obs):
         agents = []
         for obj in obs:

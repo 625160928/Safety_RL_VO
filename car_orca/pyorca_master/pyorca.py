@@ -29,8 +29,10 @@ import numpy
 from numpy import array, sqrt, copysign, dot
 from numpy.linalg import det
 import numpy as np
-import tubianxing
-import Minkowski
+from car_orca.pyorca_master import tubianxing
+from  car_orca.pyorca_master import Minkowski
+
+
 # Method:
 # For each robot A and potentially colliding robot B, compute smallest change
 # in relative velocity 'u' that avoids collision. Find normal 'n' to VO at that
@@ -68,7 +70,7 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
     changed on tick *edge*, like first-order integration, otherwise the method
     undercompensates and you will still risk colliding."""
-    # print('orca ',colliding_agents)
+    # print('car_orca ',colliding_agents)
     if limit is None:
         limit = limit_range
     else:

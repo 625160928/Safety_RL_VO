@@ -6,8 +6,8 @@ import gym
 import highway_env
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp,Line
-import pyorca
+from car_orca.pyorca_master.pyorca import Agent, get_avoidance_velocity, orca, normalized, perp,Line
+from  car_orca.pyorca_master import  pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
 
@@ -99,7 +99,7 @@ class HighWayOrca():
             print('emergy speed up')
             action[0]=1
         print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
-              agent.pref_velocity, 'orca-v', control_v, 'action ', action)
+              agent.pref_velocity, 'car_orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]
@@ -196,7 +196,7 @@ class HighWayOrca():
         print(unino_agent_collide_speed_set)
 
 
-        plt.figure(num='orca')
+        plt.figure(num='car_orca')
         plt.clf()
         # 画图
         x_major_locator = MultipleLocator(10)
