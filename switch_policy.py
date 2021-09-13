@@ -34,7 +34,7 @@ class SwitchLogic():
         config = {
             'vehicles_count': 30,
             'simulation_frequency': 1/self.dt,
-            'vehicles_density': 1,
+            'vehicles_density': 2,
             "policy_frequency": self.policy_frequency,
             "duration": 1000,
             "observation": {

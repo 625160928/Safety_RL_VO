@@ -144,7 +144,7 @@ def get_car_posiable_speed_car(agent:Agent):
     derta_vx=0.3
     acc_range_number=10
 
-    max_theta=math.pi/5
+    max_theta=math.pi/4
     steer_range_number=10
 
     for i in range(-acc_range_number,acc_range_number+1):
@@ -165,14 +165,28 @@ def get_car_posiable_speed_car(agent:Agent):
     # print(ans)
     return ans
 
+
+def get_speed_reward(lines, agent,v,t,dt):
+    tmp_reward = reward_speed(agent,v, t, dt, lines)
+    w_speed=0.35
+    w_orca=0.65
+    w_rank=0
+    control_v = v
+    re_speed = math.hypot(agent.pref_velocity[0] - control_v[0], agent.pref_velocity[1] - control_v[1])
+    re_orca = tmp_reward[1]
+    re_rank = tmp_reward[0]
+    reward = w_speed * re_speed + w_orca * re_orca + w_rank * re_rank
+    return reward
+
+
 def speed_choose(agent:Agent,rewards,actions,t):
     min_coll=9999
     for i in range(len(rewards)):
         if rewards[i][0]<min_coll:
             min_coll=rewards[i][0]
-    w_speed=0.25
-    w_orca=0.65
-    w_rank=0.1
+    w_speed=0.3
+    w_orca=0.7
+    w_rank=0
 
     min_reward=99999
     min_action=[]

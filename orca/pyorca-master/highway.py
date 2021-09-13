@@ -19,7 +19,7 @@ class HighWayOrca():
         config = {
             'vehicles_count':30,
             'simulation_frequency': 20,
-            'vehicles_density': 1.3,
+            'vehicles_density': 2,
             "policy_frequency":10,
             "duration": 1000,
             "observation": {
@@ -41,14 +41,14 @@ class HighWayOrca():
             }
         }
         self.fresh_speed=False
-        self.env.seed(11)
+        # self.env.seed(11)
         self.env.configure(config)
         self.env.reset()
         self.done = False
         self.acc = 1
         self.tau = 2
         self.dt=0.05
-        self.prev = 25
+        self.prev = 22
         self.lane=1
         self.lane_length=4
 
@@ -164,16 +164,16 @@ class HighWayOrca():
             new_v=new_vels
 
 
-            # action=new_vels
-            # new_v=pyorca.control_v_create(agents[0],action, self.tau)
             self.env.render()
+
+
             # input()
             # if count==197:
             #     input()
             if count>=0:
                 # for i in range(1,len(agents)):
                 #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
-
+                # self.draw_speed_reward(new_v,agents[0],all_line)
                 self.draw(agents[0], agents[1:],all_line,new_v)
 
     def draw_orca_collider(self,agent, collider, t, dt,limit):
@@ -184,40 +184,45 @@ class HighWayOrca():
 
         x_len_sq = pyorca.norm_sq(x)
 
-        if x_len_sq >= r * r:
-            print('agent ',agent.position,agent.velocity,' collider',collider.position,collider.velocity)
-            collider_aviliable_speed_set=pyorca.get_car_aciliable_speed(collider,t,limit)
-            unino_agent_collide_speed_set=pyorca.get_agent_collide_set(agent,collider,t)
-            agent_collide_set=pyorca.Minkowski.Minkowski_sum(collider_aviliable_speed_set,unino_agent_collide_speed_set)
-            u,n=pyorca.get_dv_n_from_tubianxing(agent.velocity,agent_collide_set)
+        if x_len_sq < r * r:
+            return None,None
+        print('agent ',agent.position,agent.velocity,' collider',collider.position,collider.velocity)
+        collider_aviliable_speed_set=pyorca.get_car_aciliable_speed(collider,t,limit)
+        unino_agent_collide_speed_set=pyorca.get_agent_collide_set(agent,collider,t)
+        agent_collide_set=pyorca.Minkowski.Minkowski_sum(collider_aviliable_speed_set,unino_agent_collide_speed_set)
+        u,n=pyorca.get_dv_n_from_tubianxing(agent.velocity,agent_collide_set)
 
-            print(collider_aviliable_speed_set)
-            print(unino_agent_collide_speed_set)
-
-
-            plt.figure(num='orca')
-            plt.clf()
-            # 画图
-            x_major_locator = MultipleLocator(10)
-            y_major_locator = MultipleLocator(10)
-            ax = plt.gca()# ax为两条坐标轴的实例
-            ax.xaxis.set_major_locator(x_major_locator)
-            # 把x轴的主刻度设置为1的倍数
-            ax.yaxis.set_major_locator(y_major_locator)
+        print(collider_aviliable_speed_set)
+        print(unino_agent_collide_speed_set)
 
 
-            for i in range(len(collider_aviliable_speed_set)):
-                collider_aviliable_speed_set[i]+=x
+        plt.figure(num='orca')
+        plt.clf()
+        # 画图
+        x_major_locator = MultipleLocator(10)
+        y_major_locator = MultipleLocator(10)
+        ax = plt.gca()# ax为两条坐标轴的实例
+        ax.xaxis.set_major_locator(x_major_locator)
+        # 把x轴的主刻度设置为1的倍数
+        ax.yaxis.set_major_locator(y_major_locator)
 
-            plt.scatter(0,0,color='red')
-            plt.scatter(x[0],x[1],color='blue')
-            draw_picture.draw_tubianxing(collider_aviliable_speed_set,color='blue')
-            draw_picture.draw_tubianxing(unino_agent_collide_speed_set,color='red')
-            draw_picture.draw_tubianxing(agent_collide_set,color='black')
-            plt.show()
+
+        for i in range(len(collider_aviliable_speed_set)):
+            collider_aviliable_speed_set[i]+=x
+
+        plt.scatter(0,0,color='red')
+        plt.scatter(x[0],x[1],color='blue')
+
+        plt.plot([0,agent.velocity[0]],[0,agent.velocity[1]],color='black')
+        plt.plot([agent.velocity[0],agent.velocity[0]+u[0]],[agent.velocity[1],agent.velocity[1]+u[1]],color='red')
+
+        draw_picture.draw_tubianxing(collider_aviliable_speed_set,color='blue')
+        draw_picture.draw_tubianxing(unino_agent_collide_speed_set,color='red')
+        draw_picture.draw_tubianxing(agent_collide_set,color='black')
+        plt.show()
 
 
-        return
+        return u,n
 
     def draw(self, my_agent:Agent, agents, lines,v_opt):
         #设置显示范围
@@ -269,6 +274,60 @@ class HighWayOrca():
         # plt.show()
         plt.pause(0.01)
         # input()
+
+    def draw_speed_reward(self,orca_v,agent,lines):
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+        from matplotlib import cm
+        from matplotlib.ticker import LinearLocator, FormatStrFormatter
+        import numpy as np
+
+        x_range=10
+        x=[]
+        y=[]
+        z=[]
+        max_reward=10
+        for i in range(int(orca_v[0])-x_range,int(orca_v[0])+x_range):
+            x_arr=[]
+            y_arr=[]
+            z_arr=[]
+            for j in range(-30,150,1):
+                # k=i+j
+                k=pyorca.get_speed_reward(lines, agent,[i,j/10],self.tau,self.dt)
+                if k>max_reward:
+                    k=max_reward
+                x_arr.append(i)
+                y_arr.append(j)
+                z_arr.append(k)
+            x.append(x_arr)
+            y.append(y_arr)
+            z.append(z_arr)
+
+        z=np.array(z)
+        x=np.array(x)
+        y=np.array(y)
+
+
+
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        surf = ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap='rainbow')
+
+        ax.set_xlabel('road')
+        ax.set_ylabel('lanes')
+        ax.set_zlabel('reward')
+        ax.set_zlim(-1.01, 8)
+        ax.set_ylim(-3, 15)
+        ax.zaxis.set_major_locator(LinearLocator(10))
+
+        fig.colorbar(surf, shrink=1, aspect=10)
+
+
+        # Add a color bar which maps values to colors.
+
+        plt.show()
+
+        return
 
     def draw_circle(self, agent, colr="r"):
         r=agent.radius
