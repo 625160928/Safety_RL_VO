@@ -7,8 +7,7 @@ import gym
 import highway_env
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from halfplaneintersect import Line
-from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp
+from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp, Line
 
 import pyorca
 from controller import pid_lateral_controller_angle
@@ -33,9 +32,9 @@ class SwitchLogic():
         self.pose=[]
         self.pred=[]
         config = {
-            'vehicles_count': 20,
+            'vehicles_count': 30,
             'simulation_frequency': 1/self.dt,
-            'vehicles_density': 1,
+            'vehicles_density': 2,
             "policy_frequency": self.policy_frequency,
             "duration": 1000,
             "observation": {
@@ -100,7 +99,7 @@ class SwitchLogic():
                     pre_obj=vehicle.predict_trajectory_constant_speed([update_predit_time])
                     # print(pre_obj[0][0][0],pre_obj[1])
                     pre_obs=[1,pre_obj[0][0][0],pre_obj[0][0][1],obj[3],obj[4],math.cos(pre_obj[1][0]),math.sin(pre_obj[1][0])]
-                    print(pre_obs)
+                    # print('predict ',pre_obs)
                     pre_obs_arr.append(pre_obs)
         # print(len(obs),len(pre_obs_arr),len(obs[0]),len(pre_obs_arr[0]))
 
@@ -119,8 +118,8 @@ class SwitchLogic():
         derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
         if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
             return True
-        # return True
-        return False
+        return True
+        # return False
 
     def run(self):
         count = 0
@@ -136,6 +135,7 @@ class SwitchLogic():
             print("now pose is ",obs[0][1],obs[0][2],' speed is ',[obs[0][3],obs[0][4]])
             # print('action ',action, type(action))
             # print('obs ',obs)
+
             if self.done:
                 if info["crashed"] == True:
                     print("crash")

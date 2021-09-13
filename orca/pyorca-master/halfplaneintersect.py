@@ -35,16 +35,6 @@ class InfeasibleError(RuntimeError):
     pass
 
 
-class Line(object):
-    """A line in space."""
-    def __init__(self, point, direction):
-        super(Line, self).__init__()
-        self.point = array(point)
-        self.direction = normalized(array(direction))
-
-    def __repr__(self):
-        return "Line(%s, %s)" % (self.point, self.direction)
-
 
 def halfplane_optimize(lines, optimal_point):
     """Find the point closest to optimal_point in the intersection of the
@@ -211,9 +201,6 @@ def line_halfplane_intersect(line, other_lines):
         print("chick")
         return  right_dist,left_dist
     return left_dist, right_dist
-
-def perp(a):
-    return array((a[1], -a[0]))
 
 def norm_sq(x):
     return dot(x, x)
