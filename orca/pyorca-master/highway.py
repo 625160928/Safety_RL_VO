@@ -19,7 +19,7 @@ class HighWayOrca():
         config = {
             'vehicles_count':30,
             'simulation_frequency': 20,
-            'vehicles_density': 2,
+            'vehicles_density': 1.5,
             "policy_frequency":10,
             "duration": 1000,
             "observation": {
@@ -45,10 +45,10 @@ class HighWayOrca():
         self.env.configure(config)
         self.env.reset()
         self.done = False
-        self.acc = 1
+        self.acc = 0.5
         self.tau = 2
         self.dt=0.05
-        self.prev = 22
+        self.prev = 20
         self.lane=1
         self.lane_length=4
 
@@ -98,8 +98,8 @@ class HighWayOrca():
         if control_v[0]>agent.velocity[0]+limit_control:
             print('emergy speed up')
             action[0]=1
-        print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
-              agent.pref_velocity, 'orca-v', control_v, 'action ', action)
+        # print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
+        #       agent.pref_velocity, 'orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]
@@ -173,8 +173,9 @@ class HighWayOrca():
             if count>=0:
                 # for i in range(1,len(agents)):
                 #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
-                # self.draw_speed_reward(new_v,agents[0],all_line)
+
                 self.draw(agents[0], agents[1:],all_line,new_v)
+                # self.draw_speed_reward(new_v,agents[0],all_line)
 
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         import draw_picture
@@ -282,7 +283,7 @@ class HighWayOrca():
         from matplotlib.ticker import LinearLocator, FormatStrFormatter
         import numpy as np
 
-        x_range=10
+        x_range=30
         x=[]
         y=[]
         z=[]
@@ -293,9 +294,9 @@ class HighWayOrca():
             z_arr=[]
             for j in range(-30,150,1):
                 # k=i+j
-                k=pyorca.get_speed_reward(lines, agent,[i,j/10],self.tau,self.dt)
-                if k>max_reward:
-                    k=max_reward
+                k=-pyorca.get_speed_reward(lines, agent,[i,j/10],self.tau,self.dt)
+                if k<-max_reward:
+                    k=-max_reward
                 x_arr.append(i)
                 y_arr.append(j)
                 z_arr.append(k)
@@ -316,7 +317,7 @@ class HighWayOrca():
         ax.set_xlabel('road')
         ax.set_ylabel('lanes')
         ax.set_zlabel('reward')
-        ax.set_zlim(-1.01, 8)
+        ax.set_zlim(-10, 2)
         ax.set_ylim(-3, 15)
         ax.zaxis.set_major_locator(LinearLocator(10))
 
