@@ -15,7 +15,7 @@ from controller import pid_lateral_controller_angle
 from car_orca.pyorca_master.highway import HighWayOrca
 
 class SwitchLogic():
-    def __init__(self):
+    def __init__(self,seed=0):
         self.policy1=0
         self.car_steer_limit = math.pi / 3
         self.env = gym.make("highway-v0")
@@ -25,28 +25,26 @@ class SwitchLogic():
         self.done = False
         self.orca_policy=HighWayOrca()
         self.tau = 2
-        self.prev = 25
-        self.env.seed(11)
+        self.prev = 20
+        self.orca_policy.prev=self.prev
+        self.orca_policy.tau=self.tau
+        self.env.seed(seed)
         self.switch_danger_theta=math.pi/6
         self.predict_time=1
         self.pose=[]
         self.pred=[]
         config = {
-            'vehicles_count': 30,
-            'simulation_frequency': 1/self.dt,
-            'vehicles_density': 2,
-            "policy_frequency": self.policy_frequency,
-            "duration": 1000,
+            "lanes_count":3,
+            "ego_spacing":0,
+            'vehicles_count': 15,
+            'simulation_frequency': 1/self.dt,#20
+            'vehicles_density': 1.5,
+            "policy_frequency": self.policy_frequency,#10
+            "duration": 200,
             "observation": {
                 "type": "Kinematics",
-                "vehicles_count": 15,
+                "vehicles_count": 6,
                 "features": ["presence", "x", "y", "vx", "vy", "cos_h", "sin_h"],
-                "features_range": {
-                    "x": [-100, 100],
-                    "y": [-100, 100],
-                    "vx": [-20, 20],
-                    "vy": [-20, 20]
-                },
                 "absolute": True,
                 "normalize": False,
                 "order": "sorted"
@@ -116,31 +114,78 @@ class SwitchLogic():
 
         derta_cos_theta=(a*a+b*b-c*c)/(2*a*b)
         derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
+
         if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
             return True
+
         return True
         # return False
 
+    def get_cloest_distance(self,obs):
+        my_x=obs[0][1]
+        my_y=obs[0][2]
+        min_dis=999999999999
+        for i in range(1,len(obs)):
+            now_x=obs[i][1]
+            now_y=obs[i][2]
+            dis=math.hypot(now_x-my_x,now_y-my_y)
+            if dis<min_dis:
+                min_dis=dis
+
+        return min_dis
+
     def run(self):
+        in_target_lan_count=0
+        crash=False
+        speed_total=0
+        min_dis_total=0
+        min_dis=99999999999999
+        leagle=True
+
+
+
+
         count = 0
         action = (0, 0)
         while not self.done:
-            print('---------------------------------------------')
             count += 1
-            print('run count ', count,"  time = ",count*self.dt)
-            print('final action is ',action)
-            # action =env.action_space.sample()
+            # print('---------------------------------------------')
+            # print('run count ', count,"  time = ",count*self.dt)
+            # print('final action is ',action)
+
             obs, reward, self.done, info = self.env.step(action)
             self.pose.append([count*self.dt,[obs[0][1],obs[0][2]]])
-            print("now pose is ",obs[0][1],obs[0][2],' speed is ',[obs[0][3],obs[0][4]])
+            # print("now pose is ",obs[0][1],obs[0][2],' speed is ',[obs[0][3],obs[0][4]])
+
+            #collect speed info
+            speed_total+=obs[0][3]
+
+            tmp_min_dis=self.get_cloest_distance(obs)
+            if tmp_min_dis<min_dis:
+                min_dis=tmp_min_dis
+            min_dis_total+=tmp_min_dis
+            for i in range(1,len(obs)):
+                if obs[i][3]<0:
+                    leagle=False
+            if obs[0][2]>self.orca_policy.lane*self.orca_policy.lane_length+(-self.orca_policy.lane_length/2) and \
+                obs[0][2]<self.orca_policy.lane*self.orca_policy.lane_length+(self.orca_policy.lane_length/2):
+                in_target_lan_count+=1
+
+
             # print('action ',action, type(action))
             # print('obs ',obs)
+            # print(obs[0][2],-self.orca_policy.lane_length/2,3*self.orca_policy.lane_length-self.orca_policy.lane_length/2)
+            if obs[0][2]<-self.orca_policy.lane_length/2 or obs[0][2]>3*self.orca_policy.lane_length-self.orca_policy.lane_length/2:
+                self.done=True
+                crash=True
 
             if self.done:
                 if info["crashed"] == True:
-                    print("crash")
+                    # print("crash")
+                    crash=True
                 else:
-                    print("done")
+                    a=0
+                    # print("done")
                 break
 
             #get rl action in current env
@@ -153,29 +198,72 @@ class SwitchLogic():
             predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
 
             if self.danger_action(predict_env_obs,pre_vel_speed):
-                print('danger, choose ORCA action')
+                # print('danger, choose ORCA action')
                 action,vel_speed=self.get_orca_action(obs)
             else:
-                print('save, choose RL action')
+                # print('save, choose RL action')
                 action=rl_action
 
             self.env.render()
-        print('----------------------------------------------------------')
+
+
+        # print('----------------------------------------------------------')
         diff=int( self.predict_time/self.dt)
-        print(diff)
+        # print(diff)
         for i in range(len(self.pose)):
             if i-diff<0:
                 continue
             else:
-                print(self.pose[i][1],' --- ',self.pred[i-diff][1])
+                a=0
+                # print(self.pose[i][1],' --- ',self.pred[i-diff][1])
 
+        keep_in_target_lane_rate=in_target_lan_count/count
+        avg_speed=speed_total/count
+        #crash
+        #min_dis
+        avg_min_dis=min_dis_total/count
+        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle
 
 
 def main():
 
-   new_highway_orca=SwitchLogic()
+   new_highway_orca=SwitchLogic(1)
    new_highway_orca.run()
+
+def anylize_test():
+    total_keep_in_target_lane_rate=0
+    total_avg_speed=0
+    total_crash=0
+    total_min_dis=0
+    total_avg_min_dis=0
+    total_count=0
+
+    count=0
+    for seed in range(1,51):
+        new_highway_orca=SwitchLogic(seed)
+        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle=new_highway_orca.run()
+        if tmp_leagle==False:
+            print("illeagle     ===========          ",end=' ')
+            continue
+
+        print('seed ',seed,' tar lane rate %.2f' % (tmp_keep_in_target_lane_rate),' avg speed %.2f' % (tmp_avg_speed),' crash ',tmp_crash,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count))
+
+        if tmp_crash==True:
+            total_crash+=1
+        count+=1
+        total_count+=tmp_count
+        total_avg_min_dis+=tmp_avg_min_dis
+        total_min_dis+=tmp_min_dis
+        total_avg_speed+=tmp_avg_speed
+        total_keep_in_target_lane_rate +=tmp_keep_in_target_lane_rate
+    print('====================================================')
+
+    print(' tar lane rate %.2f' % (total_keep_in_target_lane_rate/count),' avg speed %.2f' % (total_avg_speed/count)
+          ,' crash %.2f' % (total_crash/count),total_crash,count,' min_dis %.2f' % (total_min_dis/count),' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count))
+
+
+
 
 if __name__ == '__main__':
 
-    main()
+    anylize_test()

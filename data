@@ -1,0 +1,15 @@
+====================================================================================================================================================
+avo  seed 1-50
+
+no limit   |    tar lane rate 0.38  avg speed 18.28  crash 0.80  min_dis 4.64  avg min 11.68  avg alive time 107.96
+
+limit dt*1 |    tar lane rate 0.38  avg speed 18.26  crash 0.74  min_dis 4.66  avg min 11.64  avg alive time 111.36
+
+limit dt*3 |    tar lane rate 0.38  avg speed 18.29  crash 0.74  min_dis 4.70  avg min 11.69  avg alive time 111.34
+
+
+
+====================================================================================================================================================
+car orca
+
+limit dt*3 |    

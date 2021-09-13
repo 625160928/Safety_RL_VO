@@ -97,15 +97,25 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     # return control_potimize(lines, agent,t,dt), lines
 
     #velo
-    return speed_optimize(lines, agent,t,dt), lines
+    return speed_optimize(lines, agent,t,dt,limit), lines
 
-def speed_optimize(lines, agent,t,dt):
+def limit_v_choose(v_arr,agent,dt,limit):
+    for v in v_arr:
+        dy=agent.position[1]+v[1]*dt*3
+        if dy<limit[0] or dy>limit[1]:
+            v_arr.remove(v)
+    return v_arr
+
+def speed_optimize(lines, agent,t,dt,limit):
     contorl_arr=[]
     reward_arr=[]
     control_v_arr=[]
     init_vx,init_vy=get_vxvy_from_agent(agent)
 
     control_v_arr=get_car_posiable_speed_car(agent)
+    control_v_arr = limit_v_choose(control_v_arr,agent,dt,limit)
+
+
 
     for i in range(len(control_v_arr)):
         tmp_vx=control_v_arr[i][0]
@@ -458,7 +468,7 @@ def get_avoidance_velocity(agent, collider, t, dt):
         # We're already intersecting. Pick the closest velocity to our
         # velocity that will get us out of the collision within the next
         # timestep.
-        print("intersecting")
+        # print("intersecting")
         # w = -v - x/dt
         # u = (normalized(w) * r/dt - w)
         # n =( normalized(w))
@@ -489,7 +499,7 @@ def get_car_orca_avoidance_velocity(agent, collider, t, dt,limit):
         # We're already intersecting. Pick the closest velocity to our
         # velocity that will get us out of the collision within the next
         # timestep.
-        print("intersecting")
+        # print("intersecting")
         # w = -v - x/dt
         # u = (normalized(w) * r/dt - w)
         # n =( normalized(w))

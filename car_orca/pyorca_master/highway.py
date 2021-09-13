@@ -16,22 +16,34 @@ class HighWayOrca():
         self.car_steer_limit=math.pi/3
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
+
+        self.fresh_speed=False
+        self.env.seed(31)
+        self.done = False
+        self.acc = 0.5
+        self.tau = 2
+        self.dt=0.05
+        self.prev = 20
+        self.lane=1
+        self.lane_length=4
+
+        # 速度P控制器系数 1
+        self.Speed_Kp = 0.6
+        self.car_radiu=3.2
+
+        self.edge_remain=0.3
         config = {
-            'vehicles_count':30,
-            'simulation_frequency': 20,
-            'vehicles_density': 2,
-            "policy_frequency":10,
-            "duration": 1000,
+            "lanes_count": 3,
+            "ego_spacing": 0,
+            'vehicles_count': 15,
+            'simulation_frequency': 1 / self.dt,  # 20
+            'vehicles_density': 1.5,
+            "policy_frequency": 10,  # 10
+            "duration": 200,
             "observation": {
                 "type": "Kinematics",
-                "vehicles_count": 15,
+                "vehicles_count": 6,
                 "features": ["presence", "x", "y", "vx", "vy", "cos_h", "sin_h"],
-                "features_range": {
-                    "x": [-100, 100],
-                    "y": [-100, 100],
-                    "vx": [-20, 20],
-                    "vy": [-20, 20]
-                },
                 "absolute": True,
                 "normalize": False,
                 "order": "sorted"
@@ -40,26 +52,10 @@ class HighWayOrca():
                 "type": "ContinuousAction"
             }
         }
-        self.fresh_speed=False
-        # self.env.seed(11)
         self.env.configure(config)
         self.env.reset()
-        self.done = False
-        self.acc = 1
-        self.tau = 2
-        self.dt=0.05
-        self.prev = 22
-        self.lane=1
-        self.lane_length=4
 
-        # 速度P控制器系数 1
-        self.Speed_Kp = 0.6
-        self.car_radiu=3
-
-        self.edge_remain=0.2
-
-
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.4, K_D=0.1, K_I=0.0)
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=0.7, K_D=0.1, K_I=0.0)
 
 
 
@@ -98,8 +94,8 @@ class HighWayOrca():
         if control_v[0]>agent.velocity[0]+limit_control:
             print('emergy speed up')
             action[0]=1
-        print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
-              agent.pref_velocity, 'car_orca-v', control_v, 'action ', action)
+        # print('pose ', agent.position, agent.theta * 180 / math.pi, ' now_speed ', agent.velocity, 'pre-v',
+        #       agent.pref_velocity, 'orca-v', control_v, 'action ', action)
 
         return action
         # return [0.5,0]
@@ -173,8 +169,9 @@ class HighWayOrca():
             if count>=0:
                 # for i in range(1,len(agents)):
                 #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
-                # self.draw_speed_reward(new_v,agents[0],all_line)
+
                 self.draw(agents[0], agents[1:],all_line,new_v)
+                # self.draw_speed_reward(new_v,agents[0],all_line)
 
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         import draw_picture
@@ -282,7 +279,7 @@ class HighWayOrca():
         from matplotlib.ticker import LinearLocator, FormatStrFormatter
         import numpy as np
 
-        x_range=10
+        x_range=30
         x=[]
         y=[]
         z=[]
@@ -293,9 +290,9 @@ class HighWayOrca():
             z_arr=[]
             for j in range(-30,150,1):
                 # k=i+j
-                k=pyorca.get_speed_reward(lines, agent,[i,j/10],self.tau,self.dt)
-                if k>max_reward:
-                    k=max_reward
+                k=-pyorca.get_speed_reward(lines, agent,[i,j/10],self.tau,self.dt)
+                if k<-max_reward:
+                    k=-max_reward
                 x_arr.append(i)
                 y_arr.append(j)
                 z_arr.append(k)
@@ -316,7 +313,7 @@ class HighWayOrca():
         ax.set_xlabel('road')
         ax.set_ylabel('lanes')
         ax.set_zlabel('reward')
-        ax.set_zlim(-1.01, 8)
+        ax.set_zlim(-10, 2)
         ax.set_ylim(-3, 15)
         ax.zaxis.set_major_locator(LinearLocator(10))
 
