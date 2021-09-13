@@ -25,7 +25,9 @@ class SwitchLogic():
         self.done = False
         self.orca_policy=HighWayOrca()
         self.tau = 2
-        self.prev = 25
+        self.prev = 20
+        self.orca_policy.prev=self.prev
+        self.orca_policy.tau=self.tau
         self.env.seed(seed)
         self.switch_danger_theta=math.pi/6
         self.predict_time=1
@@ -138,7 +140,7 @@ class SwitchLogic():
         speed_total=0
         min_dis_total=0
         min_dis=99999999999999
-
+        leagle=True
 
 
 
@@ -162,7 +164,9 @@ class SwitchLogic():
             if tmp_min_dis<min_dis:
                 min_dis=tmp_min_dis
             min_dis_total+=tmp_min_dis
-
+            for i in range(1,len(obs)):
+                if obs[i][3]<0:
+                    leagle=False
             if obs[0][2]>self.orca_policy.lane*self.orca_policy.lane_length+(-self.orca_policy.lane_length/2) and \
                 obs[0][2]<self.orca_policy.lane*self.orca_policy.lane_length+(self.orca_policy.lane_length/2):
                 in_target_lan_count+=1
@@ -201,6 +205,8 @@ class SwitchLogic():
                 action=rl_action
 
             self.env.render()
+
+
         # print('----------------------------------------------------------')
         diff=int( self.predict_time/self.dt)
         # print(diff)
@@ -216,7 +222,7 @@ class SwitchLogic():
         #crash
         #min_dis
         avg_min_dis=min_dis_total/count
-        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count
+        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle
 
 
 def main():
@@ -234,12 +240,17 @@ def anylize_test():
 
     count=0
     for seed in range(1,51):
-        count+=1
         new_highway_orca=SwitchLogic(seed)
-        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count=new_highway_orca.run()
+        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle=new_highway_orca.run()
+        if tmp_leagle==False:
+            print("illeagle     ===========          ",end=' ')
+            continue
+
         print('seed ',seed,' tar lane rate %.2f' % (tmp_keep_in_target_lane_rate),' avg speed %.2f' % (tmp_avg_speed),' crash ',tmp_crash,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count))
+
         if tmp_crash==True:
             total_crash+=1
+        count+=1
         total_count+=tmp_count
         total_avg_min_dis+=tmp_avg_min_dis
         total_min_dis+=tmp_min_dis
@@ -248,7 +259,7 @@ def anylize_test():
     print('====================================================')
 
     print(' tar lane rate %.2f' % (total_keep_in_target_lane_rate/count),' avg speed %.2f' % (total_avg_speed/count)
-          ,' crash %.2f' % (total_crash/count),' min_dis %.2f' % (total_min_dis/count),' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count))
+          ,' crash %.2f' % (total_crash/count),total_crash,count,' min_dis %.2f' % (total_min_dis/count),' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count))
 
 
 
