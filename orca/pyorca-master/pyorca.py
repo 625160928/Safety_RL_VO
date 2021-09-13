@@ -77,8 +77,8 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     for collider in colliding_agents:
         # print(collider)
 
-        # dv, n = get_avoidance_velocity(agent, collider, t, dt)
-        dv, n = get_car_orca_avoidance_velocity(agent, collider, t, dt,limit)
+        dv, n = get_avoidance_velocity(agent, collider, t, dt)
+        # dv, n = get_car_orca_avoidance_velocity(agent, collider, t, dt,limit)
 
         line = Line(agent.velocity + dv , n) #这里本来应该是个个体都要有一半的避障责任（dv/2）
         lines.append(line)

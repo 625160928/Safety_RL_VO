@@ -41,7 +41,7 @@ class HighWayOrca():
             }
         }
         self.fresh_speed=False
-        # self.env.seed(11)
+        self.env.seed(11)
         self.env.configure(config)
         self.env.reset()
         self.done = False
