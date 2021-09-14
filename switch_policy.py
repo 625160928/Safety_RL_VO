@@ -49,7 +49,7 @@ class SwitchLogic():
             'simulation_frequency': 1/self.dt,#20
             'vehicles_density': 1.5,
             "policy_frequency": self.policy_frequency,#10
-            "duration": 2000,
+            "duration": 200,
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 6,
@@ -281,7 +281,7 @@ def anylize_test():
     total_count=0
     total_rl=0
     count=0
-    for seed in range(16,51):
+    for seed in range(36,51):
         new_highway_orca=SwitchLogic(seed)
         tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
         if tmp_leagle==False:
