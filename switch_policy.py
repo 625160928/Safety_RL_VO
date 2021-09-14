@@ -12,7 +12,15 @@ from car_orca.pyorca_master.pyorca import Agent, get_avoidance_velocity, orca, n
 import car_orca.pyorca_master.pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
-from car_orca.pyorca_master.highway import HighWayOrca
+from car_orca.pyorca.highway import HighWayOrca
+
+import torch as th
+from stable_baselines3 import PPO
+from torch.distributions import Categorical
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
 
 class SwitchLogic():
     def __init__(self,seed=0):
@@ -30,7 +38,8 @@ class SwitchLogic():
         self.orca_policy.tau=self.tau
         self.env.seed(seed)
         self.switch_danger_theta=math.pi/6
-        self.predict_time=1
+        self.switch_danger_dis=3
+        self.predict_time=2
         self.pose=[]
         self.pred=[]
         config = {
@@ -50,7 +59,8 @@ class SwitchLogic():
                 "order": "sorted"
             },
             "action": {
-                "type": "ContinuousAction"
+                "type": "ContinuousAction",
+                "STEERING_RANGE" : (-np.pi/3, np.pi/3)
             }
         }
         self.env.configure(config)
@@ -84,8 +94,11 @@ class SwitchLogic():
         action = self.orca_policy.change_vxvy_to_action(agents[0], new_vels)
         return action,new_vels
 
-    def get_rl_action(self,obs):
+    def get_rl_action(self,model,obs):
+        action, _ = model.predict(obs)
+        print(action)
         return (0,0)
+        return action
 
     def env_predict(self,action,obs,t,time):
         update_predit_time=self.predict_time*(1/self.dt)/self.policy_frequency
@@ -107,19 +120,41 @@ class SwitchLogic():
     def danger_action(self,env_obs,orca_speed):
         position_sin_theta=env_obs[0][6]
         position_cos_theta=env_obs[0][5]
+        # a=math.hypot(position_cos_theta,position_sin_theta)
+        # b=math.hypot(orca_speed[0],orca_speed[1])
+        # c=math.hypot(orca_speed[0]-position_cos_theta,orca_speed[1]-position_sin_theta)
 
-        a=math.hypot(position_cos_theta,position_sin_theta)
-        b=math.hypot(orca_speed[0],orca_speed[1])
-        c=math.hypot(orca_speed[0]-position_cos_theta,orca_speed[1]-position_sin_theta)
+        now_speed_x=env_obs[0][3]
+        now_speed_y=env_obs[0][4]
+        derta_speed_x=orca_speed[0]-now_speed_x
+        derta_speed_y=orca_speed[1]-now_speed_y
+
+        #使用预测后当前速度与预测后orca速度的速度差的角度作为危险判断
+        a=math.hypot(now_speed_x,now_speed_y)
+        b=math.hypot(derta_speed_x,derta_speed_y)
+        c=math.hypot(derta_speed_x-now_speed_x,derta_speed_y-now_speed_y)
+
+
+
 
         derta_cos_theta=(a*a+b*b-c*c)/(2*a*b)
         derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
 
-        if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
+
+
+        # print('predict ',env_obs[0])
+        # print('predict now speed ',now_speed_x,now_speed_y,' orca ',orca_speed,' derta_speed ',derta_speed_x,derta_speed_y)
+        # print('predict position theta ',math.atan2(position_sin_theta,position_cos_theta),' orca v theta ',math.atan2(orca_speed[1],orca_speed[0]))
+
+        # print(' danger angle ',abs(math.acos(derta_cos_theta))*180/math.pi,' limit  ',self.switch_danger_theta*180/math.pi)
+        # if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
+        #     return True
+        print('danger dis ',math.hypot(derta_speed_x,derta_speed_y),self.switch_danger_dis)
+        if math.hypot(derta_speed_x,derta_speed_y)>self.switch_danger_dis:
             return True
 
-        return True
-        # return False
+        # return True
+        return False
 
     def get_cloest_distance(self,obs):
         my_x=obs[0][1]
@@ -142,12 +177,12 @@ class SwitchLogic():
         min_dis=99999999999999
         leagle=True
 
-
-
+        model = PPO.load("../highway_env/ppo-highway4")
 
         count = 0
         action = (0, 0)
         while not self.done:
+            print('----------------------------------------------------------')
             count += 1
             # print('---------------------------------------------')
             # print('run count ', count,"  time = ",count*self.dt)
@@ -175,7 +210,7 @@ class SwitchLogic():
             # print('action ',action, type(action))
             # print('obs ',obs)
             # print(obs[0][2],-self.orca_policy.lane_length/2,3*self.orca_policy.lane_length-self.orca_policy.lane_length/2)
-            if obs[0][2]<-self.orca_policy.lane_length/2 or obs[0][2]>3*self.orca_policy.lane_length-self.orca_policy.lane_length/2:
+            if obs[0][2]<-self.orca_policy.lane_length/2-1 or obs[0][2]>1+3*self.orca_policy.lane_length-self.orca_policy.lane_length/2:
                 self.done=True
                 crash=True
 
@@ -189,8 +224,11 @@ class SwitchLogic():
                 break
 
             #get rl action in current env
-            rl_action=self.get_rl_action(obs)
+            rl_action=self.get_rl_action(model,obs)
+            orca_action,vel_speed=self.get_orca_action(obs)
 
+            print(count,' rl ',rl_action,' orca ',orca_action)
+            print('------predict time -------')
             #predict env at time=self.tau later
             predict_env_obs=self.env_predict(rl_action,obs,self.tau,count*self.dt)
 
@@ -198,12 +236,12 @@ class SwitchLogic():
             predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
 
             if self.danger_action(predict_env_obs,pre_vel_speed):
-                # print('danger, choose ORCA action')
-                action,vel_speed=self.get_orca_action(obs)
+                print('danger, choose ORCA action')
+                action=orca_action
             else:
                 # print('save, choose RL action')
                 action=rl_action
-
+            print('final action ',action)
             self.env.render()
 
 
@@ -266,4 +304,4 @@ def anylize_test():
 
 if __name__ == '__main__':
 
-    anylize_test()
+    main()
