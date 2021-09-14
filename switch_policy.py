@@ -49,7 +49,7 @@ class SwitchLogic():
             'simulation_frequency': 1/self.dt,#20
             'vehicles_density': 1.5,
             "policy_frequency": self.policy_frequency,#10
-            "duration": 200,
+            "duration": 2000,
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 6,
@@ -95,10 +95,10 @@ class SwitchLogic():
         return action,new_vels
 
     def get_rl_action(self,model,obs):
-        action, _ = model.predict(obs)
-        print(action)
-        # return (0,0)
-        return action
+        # action, _ = model.predict(obs)
+        # print(action)
+        return (0,0)
+        # return action
 
     def env_predict(self,action,obs,t,time):
         update_predit_time=self.predict_time*(1/self.dt)/self.policy_frequency
@@ -177,8 +177,8 @@ class SwitchLogic():
         min_dis=99999999999999
         leagle=True
 
-        # model=0
-        model = PPO.load("./highway_env/ppo-highway4")
+        model=0
+        # model = PPO.load("./highway_env/ppo-highway4")
 
         count = 0
         action = (0, 0)
@@ -269,7 +269,7 @@ class SwitchLogic():
 
 def main():
 
-   new_highway_orca=SwitchLogic(4)
+   new_highway_orca=SwitchLogic(18)
    new_highway_orca.run()
 
 def anylize_test():
@@ -281,7 +281,7 @@ def anylize_test():
     total_count=0
     total_rl=0
     count=0
-    for seed in range(1,51):
+    for seed in range(16,51):
         new_highway_orca=SwitchLogic(seed)
         tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
         if tmp_leagle==False:

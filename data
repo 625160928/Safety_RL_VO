@@ -8,14 +8,6 @@ limit dt*1 |    tar lane rate 0.38  avg speed 18.26  crash 0.74  min_dis 4.66  a
 
 
 
- tar lane rate 0.33  avg speed 18.31  crash 0.72 36 50  min_dis 4.74  avg min 10.70  avg alive time 109.66  avg rl time 0.00
-
-
-
-
-
-
-
 
 
 
@@ -31,8 +23,14 @@ limit dt*3 |     tar lane rate 0.67  avg speed 14.26  crash 0.22  min_dis 10.14 
 
 limit dt*3  pid 0.7|  tar lane rate 0.76  avg speed 14.80  crash 0.16  min_dis 10.32  avg min 20.52  avg alive time 178.86
 
-limit dt*3  pid 0.7+|   tar lane rate 0.77  avg speed 14.96  crash 0.11 5 46  min_dis 10.62  avg min 20.62  avg alive time 182.33  avg rl time 0.00
 
+
+
+
+
+ avo tar lane rate 0.33  avg speed 18.31  crash 0.72 36 50  min_dis 4.74  avg min 10.70  avg alive time 109.66  avg rl time 0.00
+
+orca limit dt*3  pid 0.7+|   tar lane rate 0.77  avg speed 14.96  crash 0.11 5 46  min_dis 10.62  avg min 20.62  avg alive time 182.33  avg rl time 0.00
 
 ====================================================================================================================================================
 0 0+orca
