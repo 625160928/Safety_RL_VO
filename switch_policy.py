@@ -12,7 +12,7 @@ from car_orca.pyorca_master.pyorca import Agent, get_avoidance_velocity, orca, n
 import car_orca.pyorca_master.pyorca
 from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
-from car_orca.pyorca.highway import HighWayOrca
+from car_orca.pyorca_master.highway import HighWayOrca
 
 import torch as th
 from stable_baselines3 import PPO
@@ -95,8 +95,8 @@ class SwitchLogic():
         return action,new_vels
 
     def get_rl_action(self,model,obs):
-        action, _ = model.predict(obs)
-        print(action)
+        # action, _ = model.predict(obs)
+        # print(action)
         return (0,0)
         return action
 
@@ -177,7 +177,8 @@ class SwitchLogic():
         min_dis=99999999999999
         leagle=True
 
-        model = PPO.load("../highway_env/ppo-highway4")
+        # model = PPO.load("./highway_env/ppo-highway4")
+        model=0
 
         count = 0
         action = (0, 0)
