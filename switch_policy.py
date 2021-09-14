@@ -38,7 +38,7 @@ class SwitchLogic():
         self.orca_policy.tau=self.tau
         self.env.seed(seed)
         self.switch_danger_theta=math.pi/6
-        self.switch_danger_dis=3
+        self.switch_danger_dis=2.5
         self.predict_time=2
         self.pose=[]
         self.pred=[]
@@ -95,9 +95,9 @@ class SwitchLogic():
         return action,new_vels
 
     def get_rl_action(self,model,obs):
-        # action, _ = model.predict(obs)
-        # print(action)
-        return (0,0)
+        action, _ = model.predict(obs)
+        print(action)
+        # return (0,0)
         return action
 
     def env_predict(self,action,obs,t,time):
@@ -149,12 +149,12 @@ class SwitchLogic():
         # print(' danger angle ',abs(math.acos(derta_cos_theta))*180/math.pi,' limit  ',self.switch_danger_theta*180/math.pi)
         # if abs(math.acos(derta_cos_theta))>self.switch_danger_theta:
         #     return True
-        print('danger dis ',math.hypot(derta_speed_x,derta_speed_y),self.switch_danger_dis)
+        # print('danger dis ',math.hypot(derta_speed_x,derta_speed_y),self.switch_danger_dis)
         if math.hypot(derta_speed_x,derta_speed_y)>self.switch_danger_dis:
             return True
 
-        # return True
-        return False
+        return True
+        # return False
 
     def get_cloest_distance(self,obs):
         my_x=obs[0][1]
@@ -177,13 +177,14 @@ class SwitchLogic():
         min_dis=99999999999999
         leagle=True
 
-        # model = PPO.load("./highway_env/ppo-highway4")
-        model=0
+        # model=0
+        model = PPO.load("./highway_env/ppo-highway4")
 
         count = 0
         action = (0, 0)
+        rl_count=0
         while not self.done:
-            print('----------------------------------------------------------')
+            # print('----------------------------------------------------------')
             count += 1
             # print('---------------------------------------------')
             # print('run count ', count,"  time = ",count*self.dt)
@@ -228,8 +229,8 @@ class SwitchLogic():
             rl_action=self.get_rl_action(model,obs)
             orca_action,vel_speed=self.get_orca_action(obs)
 
-            print(count,' rl ',rl_action,' orca ',orca_action)
-            print('------predict time -------')
+            # print(count,' rl ',rl_action,' orca ',orca_action)
+            # print('------predict time -------')
             #predict env at time=self.tau later
             predict_env_obs=self.env_predict(rl_action,obs,self.tau,count*self.dt)
 
@@ -237,12 +238,14 @@ class SwitchLogic():
             predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
 
             if self.danger_action(predict_env_obs,pre_vel_speed):
-                print('danger, choose ORCA action')
+                # print('danger, choose ORCA action')
                 action=orca_action
+
             else:
+                rl_count+=1
                 # print('save, choose RL action')
                 action=rl_action
-            print('final action ',action)
+            # print('final action ',action)
             self.env.render()
 
 
@@ -261,12 +264,12 @@ class SwitchLogic():
         #crash
         #min_dis
         avg_min_dis=min_dis_total/count
-        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle
+        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle,rl_count/count
 
 
 def main():
 
-   new_highway_orca=SwitchLogic(1)
+   new_highway_orca=SwitchLogic(4)
    new_highway_orca.run()
 
 def anylize_test():
@@ -276,17 +279,18 @@ def anylize_test():
     total_min_dis=0
     total_avg_min_dis=0
     total_count=0
-
+    total_rl=0
     count=0
     for seed in range(1,51):
         new_highway_orca=SwitchLogic(seed)
-        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle=new_highway_orca.run()
+        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
         if tmp_leagle==False:
-            print("illeagle     ===========          ",end=' ')
+            print("illeagle     ===========          ")
             continue
 
-        print('seed ',seed,' tar lane rate %.2f' % (tmp_keep_in_target_lane_rate),' avg speed %.2f' % (tmp_avg_speed),' crash ',tmp_crash,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count))
-
+        print('seed ',seed,' tar lane rate %.2f' % (tmp_keep_in_target_lane_rate),' avg speed %.2f' % (tmp_avg_speed),' crash ',tmp_crash
+              ,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count),' rl rate %.2f' % (tmp_rl_rate))
+        total_rl+=tmp_rl_rate
         if tmp_crash==True:
             total_crash+=1
         count+=1
@@ -298,11 +302,13 @@ def anylize_test():
     print('====================================================')
 
     print(' tar lane rate %.2f' % (total_keep_in_target_lane_rate/count),' avg speed %.2f' % (total_avg_speed/count)
-          ,' crash %.2f' % (total_crash/count),total_crash,count,' min_dis %.2f' % (total_min_dis/count),' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count))
+          ,' crash %.2f' % (total_crash/count),total_crash,count,' min_dis %.2f' % (total_min_dis/count),
+          ' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count),' avg rl time %.2f' % (total_rl/count))
 
 
 
 
 if __name__ == '__main__':
 
-    main()
+    # main()
+    anylize_test()
