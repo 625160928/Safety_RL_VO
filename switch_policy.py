@@ -103,7 +103,7 @@ class SwitchLogic():
     def get_rl_action(self,model,obs):
         # action, _ = model.predict(obs)
         # print(action)
-        return (0.5,0)
+        return (0,0)
         # return action
 
     def env_predict(self,action,obs,t,time):
@@ -161,8 +161,8 @@ class SwitchLogic():
         if math.hypot(derta_speed_x,derta_speed_y)>self.switch_danger_dis:
             return True
 
-        return True
-        # return False
+        # return True
+        return False
 
     def get_cloest_distance(self,obs):
         my_x=obs[0][1]
@@ -186,7 +186,7 @@ class SwitchLogic():
         leagle=True
 
         model=0
-        # model = PPO.load("./highway_env/ppo-highway4")
+        # model = PPO.load("./ppo-highway8")
 
         count = 0
         action = (0, 0)
@@ -322,8 +322,8 @@ def anylize_test(dep=2.0):
 
 if __name__ == '__main__':
 
-    main()
-    # for dep in [1,1.5,2]:
-    #     print('========================================================================================')
-    #     print(dep)
-    #     anylize_test(dep)
+    # main()
+    for dep in [1,1.5,2]:
+        print('========================================================================================')
+        print(dep)
+        anylize_test(dep)

@@ -76,7 +76,7 @@ class HighWayOrca():
         self.env.configure(self.config)
         self.env.reset()
 
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=8, K_D=0.2, K_I=0)
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=4, K_D=0.2, K_I=0)
 
 
 
