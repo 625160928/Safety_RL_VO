@@ -66,7 +66,7 @@ class Line(object):
 
 limit_range=[-20,34]
 
-def orca(agent, colliding_agents, t, dt, limit=None):
+def orca(agent, colliding_agents, t, dt, limit=None,method='orca'):
     """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
     changed on tick *edge*, like first-order integration, otherwise the method
     undercompensates and you will still risk colliding."""
@@ -78,9 +78,10 @@ def orca(agent, colliding_agents, t, dt, limit=None):
     lines = []
     for collider in colliding_agents:
         # print(collider)
-
-        # dv, n = get_avoidance_velocity(agent, collider, t, dt)
-        dv, n = get_car_orca_avoidance_velocity(agent, collider, t, dt,limit)
+        if method=="avo":
+            dv, n = get_avoidance_velocity(agent, collider, t, dt)
+        else:
+            dv, n = get_car_orca_avoidance_velocity(agent, collider, t, dt,limit)
 
         line = Line(agent.velocity + dv , n) #这里本来应该是个个体都要有一半的避障责任（dv/2）
         lines.append(line)

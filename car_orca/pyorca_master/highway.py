@@ -12,13 +12,13 @@ from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
 
 class HighWayOrca():
-    def __init__(self):
+    def __init__(self,seed=0,method='orca'):
         self.car_steer_limit=math.pi/3
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
 
         self.fresh_speed=False
-        self.env.seed(45)
+        self.env.seed(seed)
         self.done = False
         self.acc = 0.5
         self.tau = 2
@@ -30,7 +30,7 @@ class HighWayOrca():
         # 速度P控制器系数 1
         self.Speed_Kp = 0.6
         self.car_radiu=3.2
-
+        self.method=method
         self.edge_remain=0.3
         # config = {
         #     "lanes_count": 3,
@@ -132,22 +132,44 @@ class HighWayOrca():
         ag.velocity=np.array((vx,vy))
         return ag
 
-    def run(self):
+    def run(self,switch=9999999):
         count=0
         action = (0, 0)
+        crash=False
+        accdent_list=[]
+        accdent_len=8
         while not self.done:
             count+=1
             # action =env.action_space.sample()
             obs, reward, self.done, info = self.env.step(action)
-            print('---------------------------------------------')
-            print('run count ',count)
+            # print('---------------------------------------------')
+            # print('run count ',count)
+
+
+
+
+
+
             # print('action ',action, type(action))
             # print('obs ',obs)
             if self.done:
                 if info["crashed"]==True:
-                    print("crash")
+                    accdent_numb=0
+                    # print(obs)
+                    for i in range(1,len(obs)):
+                        obj=obs[i]
+                        # if obj[3]!=0:
+                        #     continue
+
+                        if math.hypot(obj[1]-obs[0][1],obj[2]-obs[0][2])<2*accdent_len:
+                            accdent_numb+=1
+                    # print('accdent_numb ',accdent_numb)
+                    if accdent_numb>1:
+                        crash=True
+                    # print("crash")
                 else:
-                    print("done")
+                    a=0
+                    # print("done")
                 break
 
             agents = []
@@ -173,8 +195,17 @@ class HighWayOrca():
                                                  agents[0].position[0] + 80, self.lane*self.lane_length, self.prev)
             # print('pose ',agents[0].position,' theta ',theta*180/math.pi,math.sin(theta))
 
-            # 计算orca避障速度
-            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
+            if count<=switch:
+                # 计算orca避障速度
+                new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt
+                                          , limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain]
+                                          , method=self.method)
+            else:
+                # 计算orca避障速度
+                # print('orca switch')
+                new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt
+                                          , limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain]
+                                          , method="orca")
 
             # 将速度转换为动作指令
             action = self.change_vxvy_to_action(agents[0], new_vels)
@@ -187,13 +218,13 @@ class HighWayOrca():
             # input()
             # if count==197:
             #     input()
-            if count>=0:
-                # for i in range(1,len(agents)):
-                #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
-
-                self.draw(agents[0], agents[1:],all_line,new_v)
-                # self.draw_speed_reward(new_v,agents[0],all_line)
-
+            # if count>=0:
+            #     # for i in range(1,len(agents)):
+            #     #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
+            #
+            #     self.draw(agents[0], agents[1:],all_line,new_v)
+            #     # self.draw_speed_reward(new_v,agents[0],all_line)
+        return crash,count
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         import draw_picture
 
@@ -372,8 +403,58 @@ class HighWayOrca():
         # plt.scatter(init_pose[0],init_pose[1],color='green')
 
 def main():
-   new_highway_orca=HighWayOrca()
-   new_highway_orca.run()
+    ans=[]
+    #194,273
+    coll =  [92, 94, 99, 109, 111, 114, 115, 117, 119, 122, 125, 128, 129, 130, 131, 133, 135, 138, 139, 142, 143, 144,
+             148, 154, 155, 163, 173, 176, 178, 180, 182, 183, 184, 194, 198, 202, 205, 209, 210, 211, 216, 217, 219, 221,
+             222, 225, 229, 231, 242, 244, 247, 251, 253, 257, 260, 273, 282, 288, 289, 295, 297, 298, 303, 307, 308, 312,
+             313, 318, 319, 322, 323, 324, 326, 328, 330, 333, 335, 337, 338, 341, 342, 344, 346, 347, 348, 349, 350, 357,
+             360, 363, 373, 375, 377, 382, 383, 384, 386, 387, 389, 390, 395, 396, 399, 401, 403, 406, 407, 409, 410, 418,
+             422, 423, 424, 426, 432, 434, 436, 441, 443, 444, 445, 461, 463, 465, 466, 467, 469, 471, 475, 476, 478, 483,
+             487, 496, 497, 501, 504, 505, 507, 509, 511, 515, 517, 519, 522, 530, 536, 537, 544, 545, 548, 553, 554, 561,
+             562, 569, 574, 577, 578, 579, 584, 589, 591, 596, 598, 600, 602, 605, 606, 611, 615, 617, 618, 625, 631, 632,
+             633, 635, 637, 640, 649, 651, 652, 653, 654, 655, 657, 658, 661, 669, 671, 672, 673, 674, 675, 676, 679, 680,
+             683, 684, 685, 686, 687, 697, 698, 700, 705, 706, 710, 711, 712, 717, 724, 735, 741, 752, 754, 756, 758, 770,
+             774, 778, 780, 782, 787, 795, 800, 801, 803, 806, 811, 818, 823, 827, 837, 838, 841, 843, 844, 848, 854, 855,
+             858, 859, 860, 862, 863, 866, 867, 877, 878, 881, 883, 884, 885, 887, 892, 893, 896, 898, 902, 904, 905, 907,
+             908, 914, 917, 918, 924, 928, 930, 936, 937, 939, 945, 953, 955, 959, 963, 964, 965, 966, 970, 972, 977, 978,
+             981, 986, 988, 992, 994, 995, 997, 998, 1001, 1003, 1010, 1011, 1013, 1014, 1018, 1019, 1029, 1030, 1034, 1036,
+             1037, 1038, 1040, 1041, 1042, 1051, 1052, 1053, 1055, 1058, 1059, 1064]
+    new_coll=[]
+    print(len(coll))
+    for seed in coll:
+        new_highway_orca=HighWayOrca(seed,'avo')
+        tmp_crash,tmp_count=new_highway_orca.run()
+        if tmp_crash==True:
+            new_highway_orca = HighWayOrca(seed, 'avo')
+            if tmp_count > 80:
+                orca_crash, orca_count = new_highway_orca.run(switch=tmp_count - 80)
+            else:
+                orca_crash, orca_count = new_highway_orca.run(switch=0)
+            if orca_crash==False:
+                new_coll.append(seed)
+                print(new_coll)
+
+    for seed in range(0,10000):
+        print('=====================================================')
+        print('now seed is ',seed)
+        print('now list is = ',ans)
+        new_highway_orca=HighWayOrca(seed,'avo')
+        tmp_crash,tmp_count=new_highway_orca.run()
+        if tmp_crash==False:
+            continue
+        new_highway_orca=HighWayOrca(seed,'avo')
+        if tmp_count>80:
+            orca_crash,orca_count=new_highway_orca.run(switch=tmp_count-80)
+        else:
+            orca_crash,orca_count=new_highway_orca.run(switch=0)
+        if orca_crash==True:
+            continue
+        ans.append(seed)
+        print('update list is = ',ans)
+
+
+
 
 if __name__ == '__main__':
 
