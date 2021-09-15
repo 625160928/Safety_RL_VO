@@ -117,6 +117,11 @@ seed  50  tar lane rate 1.00  avg speed 18.16  crash  False  min_dis 22.98  avg 
 
 Process finished with exit code 0
 
+
+
+avo1
+
+
 /usr/bin/python3 /home/pw123123/SynologyDrive/github/Safety_RL_VO/switch_policy.py
 /home/pw123123/.local/lib/python3.8/site-packages/highway_env/vehicle/behavior.py:148: RuntimeWarning: invalid value encountered in power
   1 - np.power(max(ego_vehicle.speed, 0) / ego_target_speed, self.DELTA))
@@ -234,3 +239,202 @@ seed  50  tar lane rate 0.54  avg speed 17.94  crash  True  min_dis 5.17  avg mi
 Process finished with exit code 0
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0.5,0+orca
+
+seed  1  tar lane rate 0.88  avg speed 20.07  crash  False  min_dis 9.60  avg min 23.36  alive time 200.00  rl rate 0.42
+seed  2  tar lane rate 0.87  avg speed 17.82  crash  False  min_dis 20.60  avg min 24.54  alive time 200.00  rl rate 0.34
+seed  3  tar lane rate 0.00  avg speed 27.80  crash  True  min_dis 5.14  avg min 21.09  alive time 28.00  rl rate 0.75
+seed  4  tar lane rate 0.82  avg speed 17.37  crash  False  min_dis 21.26  avg min 24.92  alive time 200.00  rl rate 0.29
+seed  5  tar lane rate 1.00  avg speed 18.23  crash  False  min_dis 18.98  avg min 24.54  alive time 200.00  rl rate 0.20
+seed  6  tar lane rate 1.00  avg speed 17.30  crash  False  min_dis 19.71  avg min 24.36  alive time 200.00  rl rate 0.32
+seed  7  tar lane rate 0.00  avg speed 30.50  crash  True  min_dis 3.67  avg min 18.06  alive time 45.00  rl rate 0.98
+seed  8  tar lane rate 0.91  avg speed 19.63  crash  False  min_dis 15.77  avg min 25.05  alive time 200.00  rl rate 0.28
+seed  9  tar lane rate 0.88  avg speed 18.49  crash  False  min_dis 12.55  avg min 22.97  alive time 200.00  rl rate 0.35
+seed  10  tar lane rate 1.00  avg speed 16.94  crash  False  min_dis 22.04  avg min 24.18  alive time 200.00  rl rate 0.40
+seed  11  tar lane rate 0.00  avg speed 29.07  crash  True  min_dis 3.58  avg min 20.43  alive time 34.00  rl rate 0.97
+seed  12  tar lane rate 1.00  avg speed 18.39  crash  False  min_dis 14.82  avg min 22.03  alive time 200.00  rl rate 0.50
+seed  13  tar lane rate 0.97  avg speed 18.16  crash  False  min_dis 15.68  avg min 21.84  alive time 200.00  rl rate 0.45
+seed  14  tar lane rate 1.00  avg speed 19.81  crash  False  min_dis 18.92  avg min 24.01  alive time 200.00  rl rate 0.40
+seed  15  tar lane rate 0.66  avg speed 13.50  crash  False  min_dis 5.59  avg min 41.29  alive time 200.00  rl rate 0.32
+seed  16  tar lane rate 1.00  avg speed 17.85  crash  False  min_dis 18.93  avg min 24.19  alive time 200.00  rl rate 0.33
+seed  17  tar lane rate 0.88  avg speed 18.38  crash  False  min_dis 18.75  avg min 23.51  alive time 200.00  rl rate 0.46
+seed  18  tar lane rate 0.51  avg speed 18.17  crash  False  min_dis 7.83  avg min 22.68  alive time 200.00  rl rate 0.20
+seed  19  tar lane rate 0.88  avg speed 19.15  crash  False  min_dis 17.73  avg min 24.90  alive time 200.00  rl rate 0.32
+seed  20  tar lane rate 1.00  avg speed 19.52  crash  False  min_dis 8.13  avg min 20.59  alive time 200.00  rl rate 0.54
+seed  21  tar lane rate 0.00  avg speed 28.62  crash  True  min_dis 5.07  avg min 23.73  alive time 30.00  rl rate 0.97
+seed  22  tar lane rate 1.00  avg speed 19.46  crash  False  min_dis 18.00  avg min 22.79  alive time 200.00  rl rate 0.42
+seed  23  tar lane rate 1.00  avg speed 19.48  crash  False  min_dis 17.92  avg min 23.67  alive time 200.00  rl rate 0.40
+seed  24  tar lane rate 0.86  avg speed 16.54  crash  False  min_dis 18.84  avg min 24.18  alive time 200.00  rl rate 0.39
+seed  25  tar lane rate 0.87  avg speed 20.21  crash  True  min_dis 5.35  avg min 17.78  alive time 142.00  rl rate 0.57
+seed  26  tar lane rate 0.91  avg speed 19.19  crash  False  min_dis 17.68  avg min 25.42  alive time 200.00  rl rate 0.33
+seed  27  tar lane rate 1.00  avg speed 18.08  crash  False  min_dis 19.77  avg min 24.01  alive time 200.00  rl rate 0.37
+seed  28  tar lane rate 1.00  avg speed 18.28  crash  False  min_dis 14.91  avg min 21.45  alive time 200.00  rl rate 0.39
+seed  29  tar lane rate 0.91  avg speed 18.28  crash  False  min_dis 15.71  avg min 24.13  alive time 200.00  rl rate 0.27
+seed  30  tar lane rate 1.00  avg speed 19.40  crash  False  min_dis 18.73  avg min 23.74  alive time 200.00  rl rate 0.41
+seed  31  tar lane rate 1.00  avg speed 19.58  crash  False  min_dis 18.10  avg min 23.27  alive time 200.00  rl rate 0.40
+seed  32  tar lane rate 1.00  avg speed 16.61  crash  False  min_dis 20.67  avg min 23.86  alive time 200.00  rl rate 0.36
+seed  33  tar lane rate 0.90  avg speed 18.47  crash  False  min_dis 16.33  avg min 21.92  alive time 200.00  rl rate 0.50
+seed  34  tar lane rate 0.82  avg speed 20.61  crash  False  min_dis 20.17  avg min 25.99  alive time 200.00  rl rate 0.23
+seed  35  tar lane rate 0.84  avg speed 17.33  crash  False  min_dis 14.87  avg min 22.20  alive time 200.00  rl rate 0.36
+seed  36  tar lane rate 0.88  avg speed 17.56  crash  False  min_dis 19.82  avg min 24.46  alive time 200.00  rl rate 0.30
+seed  37  tar lane rate 0.97  avg speed 18.38  crash  False  min_dis 5.53  avg min 21.93  alive time 200.00  rl rate 0.53
+seed  38  tar lane rate 1.00  avg speed 19.50  crash  False  min_dis 9.62  avg min 20.71  alive time 200.00  rl rate 0.56
+seed  39  tar lane rate 1.00  avg speed 18.98  crash  False  min_dis 17.92  avg min 23.09  alive time 200.00  rl rate 0.39
+seed  40  tar lane rate 0.76  avg speed 18.53  crash  False  min_dis 16.83  avg min 27.72  alive time 200.00  rl rate 0.18
+seed  41  tar lane rate 0.86  avg speed 19.02  crash  False  min_dis 3.71  avg min 22.39  alive time 200.00  rl rate 0.33
+seed  42  tar lane rate 1.00  avg speed 18.10  crash  False  min_dis 21.25  avg min 24.08  alive time 200.00  rl rate 0.43
+seed  43  tar lane rate 0.82  avg speed 17.03  crash  False  min_dis 18.57  avg min 22.74  alive time 200.00  rl rate 0.36
+seed  44  tar lane rate 1.00  avg speed 18.90  crash  False  min_dis 18.08  avg min 24.06  alive time 200.00  rl rate 0.41
+seed  45  tar lane rate 0.87  avg speed 20.00  crash  False  min_dis 18.15  avg min 22.76  alive time 200.00  rl rate 0.41
+seed  46  tar lane rate 0.95  avg speed 17.78  crash  False  min_dis 10.25  avg min 21.80  alive time 200.00  rl rate 0.40
+seed  47  tar lane rate 0.91  avg speed 18.85  crash  False  min_dis 19.13  avg min 24.29  alive time 200.00  rl rate 0.31
+seed  48  tar lane rate 0.85  avg speed 18.48  crash  False  min_dis 14.73  avg min 25.12  alive time 200.00  rl rate 0.35
+seed  49  tar lane rate 0.82  avg speed 19.26  crash  False  min_dis 5.65  avg min 18.12  alive time 200.00  rl rate 0.58
+seed  50  tar lane rate 0.93  avg speed 19.99  crash  False  min_dis 18.95  avg min 25.20  alive time 200.00  rl rate 0.35
+====================================================
+ tar lane rate 0.84  avg speed 19.33  crash 0.10 5 50  min_dis 14.79  avg min 23.50  avg alive time 185.58  avg rl time 0.42
+========================================================================================
+1.5
+midu  1.5
+seed  1  tar lane rate 0.72  avg speed 16.69  crash  False  min_dis 13.10  avg min 21.97  alive time 200.00  rl rate 0.38
+seed  2  tar lane rate 0.86  avg speed 16.64  crash  False  min_dis 16.68  avg min 21.52  alive time 200.00  rl rate 0.50
+seed  3  tar lane rate 0.19  avg speed 26.27  crash  True  min_dis 5.02  avg min 15.73  alive time 21.00  rl rate 0.62
+seed  4  tar lane rate 0.81  avg speed 17.67  crash  False  min_dis 18.57  avg min 22.65  alive time 200.00  rl rate 0.48
+seed  5  tar lane rate 0.98  avg speed 17.23  crash  False  min_dis 17.81  avg min 21.55  alive time 200.00  rl rate 0.45
+seed  6  tar lane rate 0.95  avg speed 16.06  crash  False  min_dis 15.17  avg min 21.10  alive time 200.00  rl rate 0.41
+seed  7  tar lane rate 0.00  avg speed 27.55  crash  True  min_dis 5.19  avg min 17.75  alive time 22.00  rl rate 0.95
+seed  8  tar lane rate 0.90  avg speed 14.86  crash  False  min_dis 16.48  avg min 20.40  alive time 200.00  rl rate 0.38
+seed  9  tar lane rate 0.54  avg speed 17.24  crash  False  min_dis 7.69  avg min 21.07  alive time 200.00  rl rate 0.35
+seed  10  tar lane rate 0.61  avg speed 16.82  crash  False  min_dis 5.57  avg min 22.16  alive time 200.00  rl rate 0.25
+seed  11  tar lane rate 0.55  avg speed 14.32  crash  False  min_dis 18.22  avg min 20.29  alive time 200.00  rl rate 0.34
+seed  12  tar lane rate 0.84  avg speed 14.92  crash  False  min_dis 14.47  avg min 20.65  alive time 200.00  rl rate 0.29
+seed  13  tar lane rate 0.94  avg speed 15.91  crash  False  min_dis 11.74  avg min 19.18  alive time 200.00  rl rate 0.50
+seed  14  tar lane rate 0.91  avg speed 17.31  crash  False  min_dis 16.39  avg min 21.24  alive time 200.00  rl rate 0.35
+seed  15  tar lane rate 0.96  avg speed 16.14  crash  False  min_dis 15.87  avg min 21.48  alive time 200.00  rl rate 0.34
+seed  16  tar lane rate 1.00  avg speed 16.82  crash  False  min_dis 19.41  avg min 23.13  alive time 200.00  rl rate 0.30
+seed  17  tar lane rate 0.71  avg speed 13.90  crash  False  min_dis 14.93  avg min 21.06  alive time 200.00  rl rate 0.30
+seed  18  tar lane rate 0.00  avg speed 27.75  crash  True  min_dis 5.21  avg min 16.35  alive time 23.00  rl rate 0.96
+seed  19  tar lane rate 0.93  avg speed 16.70  crash  False  min_dis 18.28  avg min 22.11  alive time 200.00  rl rate 0.46
+seed  20  tar lane rate 0.48  avg speed 16.93  crash  False  min_dis 3.71  avg min 23.48  alive time 200.00  rl rate 0.54
+seed  21  tar lane rate 0.00  avg speed 27.88  crash  True  min_dis 3.52  avg min 18.02  alive time 24.00  rl rate 0.96
+seed  22  tar lane rate 0.99  avg speed 16.64  crash  False  min_dis 16.93  avg min 22.69  alive time 200.00  rl rate 0.26
+seed  23  tar lane rate 1.00  avg speed 17.27  crash  False  min_dis 14.89  avg min 22.88  alive time 200.00  rl rate 0.28
+seed  24  tar lane rate 0.75  avg speed 14.57  crash  False  min_dis 8.65  avg min 18.96  alive time 200.00  rl rate 0.41
+seed  25  tar lane rate 0.82  avg speed 17.87  crash  False  min_dis 12.60  avg min 21.39  alive time 200.00  rl rate 0.35
+seed  26  tar lane rate 0.91  avg speed 16.34  crash  False  min_dis 16.20  avg min 20.93  alive time 200.00  rl rate 0.49
+seed  27  tar lane rate 0.71  avg speed 16.45  crash  False  min_dis 3.99  avg min 38.19  alive time 200.00  rl rate 0.52
+seed  28  tar lane rate 0.77  avg speed 13.61  crash  False  min_dis 17.18  avg min 20.13  alive time 200.00  rl rate 0.35
+seed  29  tar lane rate 0.00  avg speed 28.82  crash  True  min_dis 2.47  avg min 14.51  alive time 32.00  rl rate 0.97
+seed  30  tar lane rate 1.00  avg speed 16.86  crash  False  min_dis 16.58  avg min 21.70  alive time 200.00  rl rate 0.40
+seed  31  tar lane rate 1.00  avg speed 14.68  crash  False  min_dis 19.71  avg min 21.27  alive time 200.00  rl rate 0.34
+seed  32  tar lane rate 0.82  avg speed 13.74  crash  True  min_dis 5.50  avg min 18.61  alive time 84.00  rl rate 0.15
+seed  33  tar lane rate 0.89  avg speed 15.78  crash  False  min_dis 13.88  avg min 20.91  alive time 200.00  rl rate 0.33
+seed  34  tar lane rate 0.91  avg speed 15.77  crash  False  min_dis 14.81  avg min 21.61  alive time 200.00  rl rate 0.42
+seed  35  tar lane rate 0.88  avg speed 15.62  crash  False  min_dis 15.42  avg min 22.14  alive time 200.00  rl rate 0.20
+seed  36  tar lane rate 0.41  avg speed 15.25  crash  True  min_dis 3.19  avg min 17.08  alive time 70.00  rl rate 0.34
+seed  37  tar lane rate 1.00  avg speed 16.13  crash  False  min_dis 17.85  avg min 22.32  alive time 200.00  rl rate 0.33
+seed  38  tar lane rate 1.00  avg speed 16.66  crash  False  min_dis 14.37  avg min 20.37  alive time 200.00  rl rate 0.48
+seed  39  tar lane rate 0.79  avg speed 19.19  crash  True  min_dis 2.85  avg min 10.55  alive time 52.00  rl rate 0.33
+seed  40  tar lane rate 0.79  avg speed 14.89  crash  False  min_dis 18.44  avg min 22.06  alive time 200.00  rl rate 0.42
+seed  41  tar lane rate 1.00  avg speed 16.97  crash  False  min_dis 20.73  avg min 23.31  alive time 200.00  rl rate 0.29
+seed  42  tar lane rate 1.00  avg speed 16.19  crash  False  min_dis 14.86  avg min 20.83  alive time 200.00  rl rate 0.50
+seed  43  tar lane rate 0.00  avg speed 27.38  crash  True  min_dis 5.29  avg min 16.19  alive time 20.00  rl rate 0.95
+seed  44  tar lane rate 1.00  avg speed 15.47  crash  False  min_dis 16.64  avg min 21.74  alive time 200.00  rl rate 0.37
+seed  45  tar lane rate 0.86  avg speed 16.44  crash  False  min_dis 9.01  avg min 20.18  alive time 200.00  rl rate 0.41
+seed  46  tar lane rate 1.00  avg speed 17.42  crash  False  min_dis 18.55  avg min 22.07  alive time 200.00  rl rate 0.47
+seed  47  tar lane rate 0.02  avg speed 28.09  crash  True  min_dis 2.54  avg min 12.16  alive time 52.00  rl rate 0.60
+seed  48  tar lane rate 0.71  avg speed 16.78  crash  False  min_dis 2.80  avg min 38.15  alive time 200.00  rl rate 0.10
+seed  49  tar lane rate 1.00  avg speed 16.56  crash  False  min_dis 17.69  avg min 22.53  alive time 200.00  rl rate 0.29
+seed  50  tar lane rate 0.91  avg speed 16.51  crash  False  min_dis 19.59  avg min 22.57  alive time 200.00  rl rate 0.43
+====================================================
+ tar lane rate 0.74  avg speed 17.79  crash 0.20 10 50  min_dis 12.53  avg min 21.02  avg alive time 168.00  avg rl time 0.44
+========================================================================================
+2
+midu  2
+seed  1  tar lane rate 0.62  avg speed 13.39  crash  False  min_dis 9.88  avg min 17.91  alive time 200.00  rl rate 0.36
+seed  2  tar lane rate 0.91  avg speed 13.25  crash  False  min_dis 12.99  avg min 18.93  alive time 200.00  rl rate 0.34
+seed  3  tar lane rate 0.06  avg speed 25.30  crash  True  min_dis 5.22  avg min 13.56  alive time 18.00  rl rate 0.56
+seed  4  tar lane rate 0.86  avg speed 13.85  crash  False  min_dis 14.73  avg min 20.05  alive time 200.00  rl rate 0.37
+seed  5  tar lane rate 0.85  avg speed 14.13  crash  False  min_dis 12.79  avg min 19.26  alive time 200.00  rl rate 0.43
+seed  6  tar lane rate 0.57  avg speed 14.96  crash  False  min_dis 3.74  avg min 18.90  alive time 200.00  rl rate 0.47
+seed  7  tar lane rate 0.00  avg speed 27.25  crash  True  min_dis 5.01  avg min 15.34  alive time 19.00  rl rate 0.95
+seed  8  tar lane rate 0.71  avg speed 13.54  crash  False  min_dis 14.41  avg min 18.19  alive time 200.00  rl rate 0.48
+seed  9  tar lane rate 0.92  avg speed 14.13  crash  False  min_dis 11.48  avg min 19.50  alive time 200.00  rl rate 0.27
+seed  10  tar lane rate 0.64  avg speed 12.45  crash  False  min_dis 12.53  avg min 17.91  alive time 200.00  rl rate 0.46
+seed  11  tar lane rate 0.00  avg speed 27.62  crash  True  min_dis 2.40  avg min 12.40  alive time 22.00  rl rate 0.95
+seed  12  tar lane rate 0.58  avg speed 14.09  crash  False  min_dis 9.87  avg min 16.24  alive time 200.00  rl rate 0.43
+seed  13  tar lane rate 0.16  avg speed 15.01  crash  True  min_dis 3.25  avg min 17.66  alive time 106.00  rl rate 0.04
+seed  14  tar lane rate 0.99  avg speed 15.12  crash  False  min_dis 16.86  avg min 21.01  alive time 200.00  rl rate 0.27
+seed  15  tar lane rate 0.00  avg speed 28.25  crash  True  min_dis 2.76  avg min 12.91  alive time 27.00  rl rate 0.96
+seed  16  tar lane rate 0.67  avg speed 13.73  crash  True  min_dis 2.64  avg min 17.33  alive time 156.00  rl rate 0.31
+seed  17  tar lane rate 0.36  avg speed 11.13  crash  True  min_dis 3.62  avg min 16.07  alive time 162.00  rl rate 0.17
+seed  18  tar lane rate 0.00  avg speed 27.81  crash  True  min_dis 2.90  avg min 11.54  alive time 24.00  rl rate 0.96
+seed  19  tar lane rate 0.76  avg speed 11.79  crash  True  min_dis 4.54  avg min 16.84  alive time 135.00  rl rate 0.24
+seed  20  tar lane rate 0.92  avg speed 12.26  crash  False  min_dis 14.97  avg min 19.84  alive time 200.00  rl rate 0.17
+seed  21  tar lane rate 0.00  avg speed 27.88  crash  True  min_dis 2.60  avg min 13.79  alive time 24.00  rl rate 0.96
+seed  22  tar lane rate 0.81  avg speed 13.13  crash  False  min_dis 7.85  avg min 17.43  alive time 200.00  rl rate 0.42
+seed  23  tar lane rate 0.45  avg speed 10.30  crash  True  min_dis 4.62  avg min 13.86  alive time 100.00  rl rate 0.16
+seed  24  tar lane rate 0.60  avg speed 15.24  crash  False  min_dis 5.52  avg min 20.94  alive time 200.00  rl rate 0.23
+seed  25  tar lane rate 0.24  avg speed 14.00  crash  True  min_dis 8.63  avg min 13.87  alive time 93.00  rl rate 0.31
+seed  26  tar lane rate 0.94  avg speed 14.81  crash  False  min_dis 17.66  avg min 20.98  alive time 200.00  rl rate 0.41
+seed  27  tar lane rate 0.62  avg speed 15.92  crash  False  min_dis 7.56  avg min 18.57  alive time 200.00  rl rate 0.35
+seed  28  tar lane rate 0.41  avg speed 17.19  crash  True  min_dis 3.15  avg min 10.70  alive time 70.00  rl rate 0.14
+seed  29  tar lane rate 0.00  avg speed 28.06  crash  True  min_dis 3.18  avg min 13.29  alive time 26.00  rl rate 0.96
+seed  30  tar lane rate 0.67  avg speed 14.19  crash  False  min_dis 5.72  avg min 31.55  alive time 200.00  rl rate 0.12
+seed  31  tar lane rate 0.86  avg speed 12.71  crash  True  min_dis 5.76  avg min 16.00  alive time 122.00  rl rate 0.27
+seed  32  tar lane rate 0.94  avg speed 13.45  crash  False  min_dis 15.25  avg min 19.75  alive time 200.00  rl rate 0.39
+seed  33  tar lane rate 0.89  avg speed 14.03  crash  False  min_dis 9.25  avg min 18.38  alive time 200.00  rl rate 0.38
+seed  34  tar lane rate 0.77  avg speed 14.95  crash  False  min_dis 6.20  avg min 21.48  alive time 200.00  rl rate 0.21
+seed  35  tar lane rate 0.00  avg speed 25.78  crash  True  min_dis 10.12  avg min 15.97  alive time 15.00  rl rate 0.80
+seed  36  tar lane rate 0.53  avg speed 10.77  crash  True  min_dis 4.79  avg min 11.68  alive time 109.00  rl rate 0.31
+seed  37  tar lane rate 0.87  avg speed 12.35  crash  False  min_dis 15.37  avg min 19.11  alive time 200.00  rl rate 0.34
+seed  38  tar lane rate 0.53  avg speed 13.96  crash  False  min_dis 7.69  avg min 18.31  alive time 200.00  rl rate 0.40
+seed  39  tar lane rate 1.00  avg speed 25.47  crash  True  min_dis 5.20  avg min 13.53  alive time 18.00  rl rate 0.50
+seed  40  tar lane rate 0.00  avg speed 28.44  crash  True  min_dis 3.12  avg min 14.76  alive time 29.00  rl rate 0.97
+seed  41  tar lane rate 0.88  avg speed 15.44  crash  False  min_dis 5.27  avg min 34.22  alive time 200.00  rl rate 0.12
+seed  42  tar lane rate 0.72  avg speed 13.77  crash  False  min_dis 5.39  avg min 24.57  alive time 200.00  rl rate 0.25
+seed  43  tar lane rate 0.00  avg speed 27.25  crash  True  min_dis 5.17  avg min 14.27  alive time 19.00  rl rate 0.95
+seed  44  tar lane rate 0.84  avg speed 13.41  crash  False  min_dis 13.70  avg min 20.05  alive time 200.00  rl rate 0.27
+seed  45  tar lane rate 0.92  avg speed 14.24  crash  False  min_dis 7.16  avg min 18.06  alive time 200.00  rl rate 0.40
+seed  46  tar lane rate 0.89  avg speed 14.60  crash  False  min_dis 13.97  avg min 19.42  alive time 200.00  rl rate 0.47
+seed  47  tar lane rate 0.00  avg speed 27.75  crash  True  min_dis 5.17  avg min 12.95  alive time 23.00  rl rate 0.96
+seed  48  tar lane rate 0.00  avg speed 27.75  crash  True  min_dis 5.19  avg min 16.20  alive time 23.00  rl rate 0.96
+seed  49  tar lane rate 0.65  avg speed 12.91  crash  False  min_dis 12.63  avg min 17.51  alive time 200.00  rl rate 0.40
+seed  50  tar lane rate 0.90  avg speed 15.75  crash  False  min_dis 10.39  avg min 20.99  alive time 200.00  rl rate 0.28
+====================================================
+ tar lane rate 0.55  avg speed 17.29  crash 0.44 22 50  min_dis 8.00  avg min 17.67  avg alive time 138.80  avg rl time 0.46

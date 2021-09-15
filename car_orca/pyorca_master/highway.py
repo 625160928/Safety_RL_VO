@@ -18,7 +18,7 @@ class HighWayOrca():
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
 
         self.fresh_speed=False
-        self.env.seed(31)
+        self.env.seed(45)
         self.done = False
         self.acc = 0.5
         self.tau = 2
@@ -32,9 +32,29 @@ class HighWayOrca():
         self.car_radiu=3.2
 
         self.edge_remain=0.3
-        config = {
+        # config = {
+        #     "lanes_count": 3,
+        #     "ego_spacing": 0,
+        #     'vehicles_count': 15,
+        #     'simulation_frequency': 1 / self.dt,  # 20
+        #     'vehicles_density': 1.5,
+        #     "policy_frequency": 10,  # 10
+        #     "duration": 200,
+        #     "observation": {
+        #         "type": "Kinematics",
+        #         "vehicles_count": 6,
+        #         "features": ["presence", "x", "y", "vx", "vy", "cos_h", "sin_h"],
+        #         "absolute": True,
+        #         "normalize": False,
+        #         "order": "sorted"
+        #     },
+        #     "action": {
+        #         "type": "ContinuousAction"
+        #     }
+        # }
+        self.config = {
             "lanes_count": 3,
-            "ego_spacing": 0,
+            "ego_spacing": 1,
             'vehicles_count': 15,
             'simulation_frequency': 1 / self.dt,  # 20
             'vehicles_density': 1.5,
@@ -49,10 +69,11 @@ class HighWayOrca():
                 "order": "sorted"
             },
             "action": {
-                "type": "ContinuousAction"
+                "type": "ContinuousAction",
+                "STEERING_RANGE": (-np.pi / 3, np.pi / 3)
             }
         }
-        self.env.configure(config)
+        self.env.configure(self.config)
         self.env.reset()
 
         self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=8, K_D=0.2, K_I=0)

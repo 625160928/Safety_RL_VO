@@ -38,7 +38,7 @@ class SwitchLogic():
         self.orca_policy.tau=self.tau
         self.env.seed(seed)
         self.switch_danger_theta=math.pi/6
-        self.switch_danger_dis=2.5
+        self.switch_danger_dis=3.5
         self.predict_time=2
         self.pose=[]
         self.pred=[]
@@ -47,7 +47,7 @@ class SwitchLogic():
             "ego_spacing":1,
             'vehicles_count': 15,
             'simulation_frequency': 1/self.dt,#20
-            'vehicles_density': 1,
+            'vehicles_density': 1.5,
             "policy_frequency": self.policy_frequency,#10
             "duration": 200,
             "observation": {
@@ -63,12 +63,13 @@ class SwitchLogic():
                 "STEERING_RANGE" : (-np.pi/3, np.pi/3)
             }
         }
+        self.reinit()
+
+    def reinit(self):
         self.env.configure(self.config)
         self.env.reset()
-
         controller_vehicle=self.env.vehicle
         controller_vehicle.position=controller_vehicle.position+np.array([-9,0])
-        # print(controller_vehicle.position)
 
 
     #et car_orca action from car_orca
@@ -102,7 +103,7 @@ class SwitchLogic():
     def get_rl_action(self,model,obs):
         # action, _ = model.predict(obs)
         # print(action)
-        return (0,0)
+        return (0.5,0)
         # return action
 
     def env_predict(self,action,obs,t,time):
@@ -120,7 +121,6 @@ class SwitchLogic():
         # print(len(obs),len(pre_obs_arr),len(obs[0]),len(pre_obs_arr[0]))
 
         return pre_obs_arr
-
 
     def danger_action(self,env_obs,orca_speed):
         position_sin_theta=env_obs[0][6]
@@ -280,7 +280,8 @@ def main():
    new_highway_orca=SwitchLogic(18)
    new_highway_orca.run()
 
-def anylize_test():
+def anylize_test(dep=2.0):
+    print('midu ',dep)
     total_keep_in_target_lane_rate=0
     total_avg_speed=0
     total_crash=0
@@ -291,6 +292,9 @@ def anylize_test():
     count=0
     for seed in range(1,51):
         new_highway_orca=SwitchLogic(seed)
+        new_highway_orca.config['vehicles_density']=dep
+        new_highway_orca.reinit()
+        # print()
         tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
         if tmp_leagle==False:
             print("illeagle     ===========          ")
@@ -318,5 +322,8 @@ def anylize_test():
 
 if __name__ == '__main__':
 
-    # main()
-    anylize_test()
+    main()
+    # for dep in [1,1.5,2]:
+    #     print('========================================================================================')
+    #     print(dep)
+    #     anylize_test(dep)

@@ -8,5 +8,34 @@ avo1     tar lane rate 0.81  avg speed 18.99  crash 0.12 6 50  min_dis 6.64  avg
 
 
 
-        controller_vehicle=self.env.vehicle
-        controller_vehicle.position=controller_vehicle.position+np.array([-9,0])
+controller_vehicle=self.env.vehicle
+controller_vehicle.position=controller_vehicle.position+np.array([-9,0])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
