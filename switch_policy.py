@@ -42,12 +42,12 @@ class SwitchLogic():
         self.predict_time=2
         self.pose=[]
         self.pred=[]
-        config = {
+        self.config = {
             "lanes_count":3,
-            "ego_spacing":0,
+            "ego_spacing":1,
             'vehicles_count': 15,
             'simulation_frequency': 1/self.dt,#20
-            'vehicles_density': 1.5,
+            'vehicles_density': 1,
             "policy_frequency": self.policy_frequency,#10
             "duration": 200,
             "observation": {
@@ -63,8 +63,13 @@ class SwitchLogic():
                 "STEERING_RANGE" : (-np.pi/3, np.pi/3)
             }
         }
-        self.env.configure(config)
+        self.env.configure(self.config)
         self.env.reset()
+
+        controller_vehicle=self.env.vehicle
+        controller_vehicle.position=controller_vehicle.position+np.array([-9,0])
+        # print(controller_vehicle.position)
+
 
     #et car_orca action from car_orca
     def get_orca_action(self,obs):
@@ -136,7 +141,10 @@ class SwitchLogic():
 
 
 
-
+        if a==0 :
+            a=0.000000000001
+        if b==0:
+            b=0.00000000000001
         derta_cos_theta=(a*a+b*b-c*c)/(2*a*b)
         derta_cos_theta=numpy.clip(derta_cos_theta,-1,1)
 
@@ -281,7 +289,7 @@ def anylize_test():
     total_count=0
     total_rl=0
     count=0
-    for seed in range(36,51):
+    for seed in range(1,51):
         new_highway_orca=SwitchLogic(seed)
         tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
         if tmp_leagle==False:
