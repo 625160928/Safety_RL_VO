@@ -59,7 +59,7 @@ class HighWayOrca():
             'simulation_frequency': 1 / self.dt,  # 20
             'vehicles_density': 1.5,
             "policy_frequency": 10,  # 10
-            "duration": 200,
+            "duration": 300,
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 6,
@@ -218,12 +218,12 @@ class HighWayOrca():
             # input()
             # if count==197:
             #     input()
-            # if count>=0:
-            #     # for i in range(1,len(agents)):
-            #     #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
-            #
-            #     self.draw(agents[0], agents[1:],all_line,new_v)
-            #     # self.draw_speed_reward(new_v,agents[0],all_line)
+            if count>=0:
+                # for i in range(1,len(agents)):
+                #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
+
+                self.draw(agents[0], agents[1:],all_line,new_v)
+                # self.draw_speed_reward(new_v,agents[0],all_line)
         return crash,count
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         import draw_picture
@@ -404,11 +404,8 @@ class HighWayOrca():
 
 def main():
     ans=[]
-    #194,273
-    coll =  [92, 94, 99, 109, 111, 114, 115, 117, 119, 122, 125, 128, 129, 130, 131, 133, 135, 138, 139, 142, 143, 144,
-             148, 154, 155, 163, 173, 176, 178, 180, 182, 183, 184, 194, 198, 202, 205, 209, 210, 211, 216, 217, 219, 221,
-             222, 225, 229, 231, 242, 244, 247, 251, 253, 257, 260, 273, 282, 288, 289, 295, 297, 298, 303, 307, 308, 312,
-             313, 318, 319, 322, 323, 324, 326, 328, 330, 333, 335, 337, 338, 341, 342, 344, 346, 347, 348, 349, 350, 357,
+    #194,273,349
+    coll =  [92, 94, 99, 109, 125, 138, 183, 184, 194, 205, 221, 231, 251, 273, 312, 349, 350, 357,
              360, 363, 373, 375, 377, 382, 383, 384, 386, 387, 389, 390, 395, 396, 399, 401, 403, 406, 407, 409, 410, 418,
              422, 423, 424, 426, 432, 434, 436, 441, 443, 444, 445, 461, 463, 465, 466, 467, 469, 471, 475, 476, 478, 483,
              487, 496, 497, 501, 504, 505, 507, 509, 511, 515, 517, 519, 522, 530, 536, 537, 544, 545, 548, 553, 554, 561,
@@ -421,6 +418,7 @@ def main():
              981, 986, 988, 992, 994, 995, 997, 998, 1001, 1003, 1010, 1011, 1013, 1014, 1018, 1019, 1029, 1030, 1034, 1036,
              1037, 1038, 1040, 1041, 1042, 1051, 1052, 1053, 1055, 1058, 1059, 1064]
     new_coll=[]
+    coll=[349]
     print(len(coll))
     for seed in coll:
         new_highway_orca=HighWayOrca(seed,'avo')
@@ -435,23 +433,23 @@ def main():
                 new_coll.append(seed)
                 print(new_coll)
 
-    for seed in range(0,10000):
-        print('=====================================================')
-        print('now seed is ',seed)
-        print('now list is = ',ans)
-        new_highway_orca=HighWayOrca(seed,'avo')
-        tmp_crash,tmp_count=new_highway_orca.run()
-        if tmp_crash==False:
-            continue
-        new_highway_orca=HighWayOrca(seed,'avo')
-        if tmp_count>80:
-            orca_crash,orca_count=new_highway_orca.run(switch=tmp_count-80)
-        else:
-            orca_crash,orca_count=new_highway_orca.run(switch=0)
-        if orca_crash==True:
-            continue
-        ans.append(seed)
-        print('update list is = ',ans)
+    # for seed in range(0,10000):
+    #     print('=====================================================')
+    #     print('now seed is ',seed)
+    #     print('now list is = ',ans)
+    #     new_highway_orca=HighWayOrca(seed,'avo')
+    #     tmp_crash,tmp_count=new_highway_orca.run()
+    #     if tmp_crash==False:
+    #         continue
+    #     new_highway_orca=HighWayOrca(seed,'avo')
+    #     if tmp_count>80:
+    #         orca_crash,orca_count=new_highway_orca.run(switch=tmp_count-80)
+    #     else:
+    #         orca_crash,orca_count=new_highway_orca.run(switch=0)
+    #     if orca_crash==True:
+    #         continue
+    #     ans.append(seed)
+    #     print('update list is = ',ans)
 
 
 
