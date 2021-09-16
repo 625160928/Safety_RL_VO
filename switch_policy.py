@@ -103,7 +103,7 @@ class SwitchLogic():
     def get_rl_action(self,model,obs):
         # action, _ = model.predict(obs)
         # print(action)
-        return (0.5,0)
+        return (0,0)
         # return action
 
     def env_predict(self,action,obs,t,time):
@@ -161,8 +161,8 @@ class SwitchLogic():
         if math.hypot(derta_speed_x,derta_speed_y)>self.switch_danger_dis:
             return True
 
-        return True
-        # return False
+        # return True
+        return False
 
     def get_cloest_distance(self,obs):
         my_x=obs[0][1]
@@ -187,10 +187,11 @@ class SwitchLogic():
 
         model=0
         # model = PPO.load("./ppo-highway8")
-
+        switch_times=0
         count = 0
         action = (0, 0)
         rl_count=0
+        old='rl'
         while not self.done:
             # print('----------------------------------------------------------')
             count += 1
@@ -248,9 +249,15 @@ class SwitchLogic():
             if self.danger_action(predict_env_obs,pre_vel_speed):
                 # print('danger, choose ORCA action')
                 action=orca_action
+                if old=='rl':
+                    switch_times+=1
+                    old="orca"
 
             else:
                 rl_count+=1
+                if old=='orca':
+                    switch_times+=1
+                    old="rl"
                 # print('save, choose RL action')
                 action=rl_action
             # print('final action ',action)
@@ -272,7 +279,7 @@ class SwitchLogic():
         #crash
         #min_dis
         avg_min_dis=min_dis_total/count
-        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle,rl_count/count
+        return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle,rl_count/count,switch_times
 
 
 def main():
@@ -289,25 +296,28 @@ def anylize_test(dep=2.0):
     total_avg_min_dis=0
     total_count=0
     total_rl=0
+    total_switch_times=0
     count=0
     for seed in range(1,51):
         new_highway_orca=SwitchLogic(seed)
         new_highway_orca.config['vehicles_density']=dep
         new_highway_orca.reinit()
         # print()
-        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate=new_highway_orca.run()
+        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate,tmp_switch_times=new_highway_orca.run()
         if tmp_leagle==False:
             print("illeagle     ===========          ")
             continue
 
         print('seed ',seed,' tar lane rate %.2f' % (tmp_keep_in_target_lane_rate),' avg speed %.2f' % (tmp_avg_speed),' crash ',tmp_crash
-              ,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count),' rl rate %.2f' % (tmp_rl_rate))
+              ,' min_dis %.2f' % (tmp_min_dis),' avg min %.2f' % (tmp_avg_min_dis),' alive time %.2f' % (tmp_count),
+              ' rl rate %.2f' % (tmp_rl_rate),' switch times %.2f' % (tmp_switch_times))
         total_rl+=tmp_rl_rate*tmp_count
         if tmp_crash==True:
             total_crash+=1
         count+=1
         total_count+=tmp_count
         total_avg_min_dis+=tmp_avg_min_dis
+        total_switch_times+=tmp_switch_times
         total_min_dis+=tmp_min_dis
         total_avg_speed+=tmp_avg_speed
         total_keep_in_target_lane_rate +=tmp_keep_in_target_lane_rate
@@ -315,7 +325,8 @@ def anylize_test(dep=2.0):
 
     print(' tar lane rate %.2f' % (total_keep_in_target_lane_rate/count),' avg speed %.2f' % (total_avg_speed/count)
           ,' crash %.2f' % (total_crash/count),total_crash,count,' min_dis %.2f' % (total_min_dis/count),
-          ' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count),' avg rl time %.2f' % (total_rl/total_count))
+          ' avg min %.2f' % (total_avg_min_dis/count),' avg alive time %.2f' % (total_count/count)
+          ,' avg rl time %.2f' % (total_rl/total_count),' avg switch time %.2f' % (total_switch_times/count))
 
 
 

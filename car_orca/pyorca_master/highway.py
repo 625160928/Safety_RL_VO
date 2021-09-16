@@ -156,16 +156,22 @@ class HighWayOrca():
                 if info["crashed"]==True:
                     accdent_numb=0
                     # print(obs)
-                    for i in range(1,len(obs)):
-                        obj=obs[i]
-                        # if obj[3]!=0:
-                        #     continue
 
-                        if math.hypot(obj[1]-obs[0][1],obj[2]-obs[0][2])<2*accdent_len:
-                            accdent_numb+=1
-                    # print('accdent_numb ',accdent_numb)
-                    if accdent_numb>1:
-                        crash=True
+
+
+                    # for i in range(1,len(obs)):
+                    #     obj=obs[i]
+                    #     # if obj[3]!=0:
+                    #     #     continue
+                    #
+                    #     if math.hypot(obj[1]-obs[0][1],obj[2]-obs[0][2])<2*accdent_len:
+                    #         accdent_numb+=1
+                    # # print('accdent_numb ',accdent_numb)
+                    # if accdent_numb>1:
+                    #     crash=True
+
+
+                    crash=True
                     # print("crash")
                 else:
                     a=0
