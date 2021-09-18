@@ -225,12 +225,17 @@ class HighWayOrca():
             # if count==197:
             #     input()
             if count>=0:
+                print('[')
+                for obj in obs:
+                    print('[',count,',%.2f' %obj[1],',%.2f' %obj[2],',%.2f' %(math.atan2(obj[6],obj[5])),'],')
+                print('],')
                 # for i in range(1,len(agents)):
                 #     self.draw_orca_collider(agents[0],agents[i],self.tau, self.dt,limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain])
 
                 self.draw(agents[0], agents[1:],all_line,new_v)
                 # self.draw_speed_reward(new_v,agents[0],all_line)
         return crash,count
+
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         import draw_picture
 
@@ -427,14 +432,17 @@ def main():
     coll=[349]
     print(len(coll))
     for seed in coll:
+        print('=========================')
         new_highway_orca=HighWayOrca(seed,'avo')
         tmp_crash,tmp_count=new_highway_orca.run()
+        print('=========================')
         if tmp_crash==True:
             new_highway_orca = HighWayOrca(seed, 'avo')
             if tmp_count > 80:
                 orca_crash, orca_count = new_highway_orca.run(switch=tmp_count - 80)
             else:
                 orca_crash, orca_count = new_highway_orca.run(switch=0)
+
             if orca_crash==False:
                 new_coll.append(seed)
                 print(new_coll)
