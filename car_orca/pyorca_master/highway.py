@@ -12,7 +12,7 @@ from controller import pid_lateral_controller_angle
 # from controller import pid_longitudinal_controller
 
 class HighWayOrca():
-    def __init__(self,seed=0,method='orca'):
+    def __init__(self,seed=0,method='avo'):
         self.car_steer_limit=math.pi/3
         self.env = gym.make("highway-v0")
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
@@ -138,26 +138,49 @@ class HighWayOrca():
         crash=False
         accdent_list=[]
         accdent_len=8
+
+        #for -path
+        carlist = []
+        allcar = []
+        veh = self.env.road.vehicles
+        if veh:
+            for v in veh:
+                Ind = count
+                carlist.append([Ind, v.position[0], v.position[1], v.heading])
+
+        # car_data = np.array([carlist])
+        allcar.append(carlist)
+
+            # end for-path
+
         while not self.done:
             count+=1
             # action =env.action_space.sample()
             obs, reward, self.done, info = self.env.step(action)
+
+            #  for-path
+            carlist = []
+            veh = self.env.road.vehicles
+            if veh:
+                for v in veh:
+                    Ind = count
+                    carlist.append([Ind, v.position[0], v.position[1], v.heading])
+
+            # car_data=hstack((car_data,[np.array(carlist)]))
+            allcar.append(carlist)
+            #  end for-path
+
+
             # print('---------------------------------------------')
             # print('run count ',count)
-
-
-
-
-
 
             # print('action ',action, type(action))
             # print('obs ',obs)
             if self.done:
+                np.save('car_data_ppo.npy', car_data)
                 if info["crashed"]==True:
                     accdent_numb=0
                     # print(obs)
-
-
 
                     # for i in range(1,len(obs)):
                     #     obj=obs[i]
@@ -169,12 +192,14 @@ class HighWayOrca():
                     # # print('accdent_numb ',accdent_numb)
                     # if accdent_numb>1:
                     #     crash=True
-
-
+                    car_data = np.array(allcar)
+                    np.save('car_data_ppo.npy', car_data)
                     crash=True
                     # print("crash")
                 else:
                     a=0
+                    car_data = np.array(allcar)
+                    np.save('car_data_ppo.npy', car_data)
                     # print("done")
                 break
 
@@ -214,6 +239,8 @@ class HighWayOrca():
                                           , method="orca")
 
             # 将速度转换为动作指令
+            new_vels[0] = new_vels[0]+1
+            new_vels[1] = new_vels[1] + 0.3
             action = self.change_vxvy_to_action(agents[0], new_vels)
             new_v=new_vels
 

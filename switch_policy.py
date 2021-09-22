@@ -31,7 +31,7 @@ class SwitchLogic():
         self.policy_frequency=10
         self.dt=0.05
         self.done = False
-        self.orca_policy=HighWayOrca()
+        self.orca_policy=HighWayOrca(seed,'avo')
         self.tau = 2
         self.prev = 20
         self.orca_policy.prev=self.prev
@@ -73,7 +73,7 @@ class SwitchLogic():
 
 
     #et car_orca action from car_orca
-    def get_orca_action(self,obs):
+    def get_orca_action(self,obs,method=None):
         agents = []
         for obj in obs:
             pd = False
@@ -92,9 +92,15 @@ class SwitchLogic():
         # print('pose ',agents[0].position,' theta ',theta*180/math.pi,math.sin(theta))
 
         # 计算orca避障速度
-        new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,
-                                  limit=[-2 + agents[0].radius / 2 + self.orca_policy.edge_remain,
-                                         14 - agents[0].radius / 2 - self.orca_policy.edge_remain])
+        if method==None:
+            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,
+                                      limit=[-2 + agents[0].radius / 2 + self.orca_policy.edge_remain,
+                                             14 - agents[0].radius / 2 - self.orca_policy.edge_remain],method=self.orca_policy.method)
+        else:
+            new_vels, all_line = orca(agents[0], agents[1:], self.tau, self.dt,
+                                      limit=[-2 + agents[0].radius / 2 + self.orca_policy.edge_remain,
+                                             14 - agents[0].radius / 2 - self.orca_policy.edge_remain],method=method)
+
 
         # 将速度转换为动作指令
         action = self.orca_policy.change_vxvy_to_action(agents[0], new_vels)
@@ -103,7 +109,7 @@ class SwitchLogic():
     def get_rl_action(self,model,obs):
         # action, _ = model.predict(obs)
         # print(action)
-        return (0,0)
+        return (0.5,-0.5)
         # return action
 
     def env_predict(self,action,obs,t,time):
@@ -177,7 +183,7 @@ class SwitchLogic():
 
         return min_dis
 
-    def run(self):
+    def run(self,switch_count=9999,switch_method='orca'):
         in_target_lan_count=0
         crash=False
         speed_total=0
@@ -192,6 +198,21 @@ class SwitchLogic():
         action = (0, 0)
         rl_count=0
         old='rl'
+
+        # for-path
+        carlist = []
+        allcar = []
+        veh = self.env.road.vehicles
+        if veh:
+            for v in veh:
+                Ind = 0
+                carlist.append([Ind, v.position[0], v.position[1], v.heading])
+
+        # car_data = np.array([carlist])
+        allcar.append(carlist)
+
+        # end for-path
+
         while not self.done:
             # print('----------------------------------------------------------')
             count += 1
@@ -236,7 +257,10 @@ class SwitchLogic():
 
             #get rl action in current env
             rl_action=self.get_rl_action(model,obs)
-            orca_action,vel_speed=self.get_orca_action(obs)
+            if count<switch_count:
+                orca_action,vel_speed=self.get_orca_action(obs)
+            else:
+                orca_action,vel_speed=self.get_orca_action(obs,switch_method)
 
             # print(count,' rl ',rl_action,' orca ',orca_action)
             # print('------predict time -------')
@@ -244,7 +268,12 @@ class SwitchLogic():
             predict_env_obs=self.env_predict(rl_action,obs,self.tau,count*self.dt)
 
             #get action in predict env and check, whether action is danger
-            predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
+
+            if count<switch_count:
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
+            else:
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,switch_method)
+
 
             if self.danger_action(predict_env_obs,pre_vel_speed):
                 # print('danger, choose ORCA action')
@@ -261,6 +290,20 @@ class SwitchLogic():
                 # print('save, choose RL action')
                 action=rl_action
             # print('final action ',action)
+            # action = orca_action
+
+            #  for-path
+            carlist = []
+            veh = self.env.road.vehicles
+            if veh:
+                for v in veh:
+                    Ind = count
+                    carlist.append([Ind, v.position[0], v.position[1], v.heading])
+
+            # car_data=hstack((car_data,[np.array(carlist)]))
+            allcar.append(carlist)
+            #  end for-path
+
             self.env.render()
 
 
@@ -279,6 +322,10 @@ class SwitchLogic():
         #crash
         #min_dis
         avg_min_dis=min_dis_total/count
+
+        car_data = np.array(allcar)
+        np.save('car_data_mix.npy', car_data)
+
         return keep_in_target_lane_rate,avg_speed,crash,min_dis,avg_min_dis,count,leagle,rl_count/count,switch_times
 
 
@@ -298,12 +345,29 @@ def anylize_test(dep=2.0):
     total_rl=0
     total_switch_times=0
     count=0
+
+
+    #初始化使用的orca方法
+    init_method='avo'
+
+    # 在第switch_to_orca_count的时候强制切换成switch_methods方法
+    switch_to_orca_count=999
+    switch_methods='orca'
+
     for seed in range(1,51):
         new_highway_orca=SwitchLogic(seed)
+
+
+
+        new_highway_orca.orca_policy.method=init_method   # chu shi xuan ze avo
+
+
+
         new_highway_orca.config['vehicles_density']=dep
         new_highway_orca.reinit()
         # print()
-        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,tmp_leagle,tmp_rl_rate,tmp_switch_times=new_highway_orca.run()
+        tmp_keep_in_target_lane_rate, tmp_avg_speed, tmp_crash, tmp_min_dis, tmp_avg_min_dis,tmp_count,\
+        tmp_leagle,tmp_rl_rate,tmp_switch_times=new_highway_orca.run(switch_count=switch_to_orca_count,switch_method=switch_methods)
         if tmp_leagle==False:
             print("illeagle     ===========          ")
             continue
@@ -333,8 +397,8 @@ def anylize_test(dep=2.0):
 
 if __name__ == '__main__':
 
-    # main()
-    for dep in [1,1.5,2]:
-        print('========================================================================================')
-        print(dep)
-        anylize_test(dep)
+    main()
+    # for dep in [1,1.5,2]:
+    #     print('========================================================================================')
+    #     print(dep)
+    #     anylize_test(dep)
