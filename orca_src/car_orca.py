@@ -26,7 +26,7 @@ from orca_src.class_agent import Agent
 class CarOrca(Orca):
     #目前输入的sim_env是一整个环境，但实际上只可以用其中的参数
     #没对环境做保护，所以尽量不要调用env的render，step等方法
-    def __init__(self,sim_env=None,method='avo'):
+    def __init__(self,sim_env=None,method='orca'):
         Orca.__init__(self,method=method)
         self.env=sim_env
         self.done = False
@@ -34,15 +34,15 @@ class CarOrca(Orca):
     #为highway，切换逻辑提供的输出反馈
     #输入的method指使用avo还是orca获取控制，只有【avo，orca】i啷个选择
     def get_action(self, obs, method=None):
-        return self.get_action_from_obs(obs, method)
+        return self._get_action_from_obs(obs, method)
 
     #速度控制器
     #输入为目标速度与当前速度，输出为油门大小
-    def PControl(self, target, current):
+    def _PControl(self, target, current):
         return self.Speed_Kp * (target - current)
 
     #从单个obj观察结果获取一个agent
-    def get_agent_from_obj(self, obj):
+    def _get_agent_from_obj(self, obj):
         position=(obj[1], obj[2])
         velocity = (obj[3], obj[4])
 
@@ -54,7 +54,7 @@ class CarOrca(Orca):
         return agent
 
     #从obs里提取出agent 的list
-    def get_agents_from_obs(self,obs):
+    def _get_agents_from_obs(self, obs):
         agents=[]
         new_speed=0
         for obj in obs:
@@ -64,12 +64,12 @@ class CarOrca(Orca):
                 if i !=0:
                     pd=True
             if pd:
-                agents.append(self.get_agent_from_obj(obj))
+                agents.append(self._get_agent_from_obj(obj))
 
         return agents
 
     #将正常orca的输出【vx,vy】,转换成车辆使用的控制【油门，转角】
-    def change_vxvy_to_action(self,agent:Agent,control_v):
+    def _change_vxvy_to_action(self, agent:Agent, control_v):
         l=control_v[0]
         # print(agent.position[0],agent.position[1],agent.theta*180/math.pi)
         control_theta=math.atan2(control_v[1],control_v[0])
@@ -80,7 +80,7 @@ class CarOrca(Orca):
 
         steer=self.later_pid.run_step(0, 0, agent.theta, goal_x, goal_y, control_theta, now_v)
 
-        ai= self.PControl( l,now_v)
+        ai= self._PControl(l, now_v)
 
         # if steer>math.pi/2:
         #     steer=math.pi/2
@@ -102,7 +102,7 @@ class CarOrca(Orca):
         return action
 
     #在orca的基础上进行封装，通过agent 的list 获取油门方向盘角度的控制（也有可能是前轮转角）
-    def get_action_from_agents(self,agents, method):
+    def _get_action_from_agents(self, agents, method):
 
         # 计算orca避障速度
         new_vels, all_line = self.orca(agents[0], agents[1:], self.tau, self.dt
@@ -112,14 +112,14 @@ class CarOrca(Orca):
         # 将速度转换为动作指令
         new_vels[0] = new_vels[0]+1
         new_vels[1] = new_vels[1] + 0.3
-        action = self.change_vxvy_to_action(agents[0], new_vels)
+        action = self._change_vxvy_to_action(agents[0], new_vels)
         return new_vels,action
 
     """
     输入是highway仿真环境的obs，控制方法method
     输入是车辆油门，方向盘角度
     """
-    def get_action_from_obs(self, obs, method=None):
+    def _get_action_from_obs(self, obs, method=None):
 
         # 将obs的数据格式转换成orca使用的agents类型
         agents = []
@@ -129,7 +129,7 @@ class CarOrca(Orca):
                 if i != 0:
                     pd = True
             if pd:
-                agents.append(self.get_agent_from_obj(obj))
+                agents.append(self._get_agent_from_obj(obj))
                 # print('pre ',obj[0],' x ',obj[1],' y ',obj[2],' vx ',obj[3],' vy ',obj[4],' cosh ',obj[5],' sinh ',obj[6] )
 
         # 设置目标速度，换道决策
@@ -138,7 +138,7 @@ class CarOrca(Orca):
                                                               self.lane * self.lane_length,
                                                               self.prev)
         # 计算orca避障速度
-        new_vels,action=self.get_action_from_agents(agents,method)
+        new_vels,action=self._get_action_from_agents(agents, method)
 
         return action, new_vels
 
