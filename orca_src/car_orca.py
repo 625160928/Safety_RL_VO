@@ -7,21 +7,41 @@ from env.highway_sim_env import HighwaySimulation
 from orca_src.orca import Orca
 from orca_src.class_agent import Agent
 
+
+"""
+【类名】：CarOrca
+【备注】：
+原生的orca使用的控制输出是vx,vy
+在进行封装继承后控制输出变成了油门转向
+输入也添加了从highway输入的obs转换成orca使用的agent类的方法
+
+纵向控制器使用的是pc控制器，其实就是线性加权
+横向控制器目前用的是pid，后续改成其他更好的方案
+
+【使用方法】
+
+
+
+"""
 class CarOrca(Orca):
+    #目前输入的sim_env是一整个环境，但实际上只可以用其中的参数
+    #没对环境做保护，所以尽量不要调用env的render，step等方法
     def __init__(self,sim_env=None,method='avo'):
-        Orca.__init__(self,method='avo')
-        self.fresh_speed=False
+        Orca.__init__(self,method=method)
         self.env=sim_env
         self.done = False
 
+    #为highway，切换逻辑提供的输出反馈
+    #输入的method指使用avo还是orca获取控制，只有【avo，orca】i啷个选择
     def get_action(self, obs, method=None):
         return self.get_action_from_obs(obs, method)
 
     #速度控制器
+    #输入为目标速度与当前速度，输出为油门大小
     def PControl(self, target, current):
         return self.Speed_Kp * (target - current)
 
-
+    #从单个obj观察结果获取一个agent
     def get_agent_from_obj(self, obj):
         position=(obj[1], obj[2])
         velocity = (obj[3], obj[4])
@@ -33,7 +53,7 @@ class CarOrca(Orca):
         agent.velocity=np.array((vx,vy))
         return agent
 
-
+    #从obs里提取出agent 的list
     def get_agents_from_obs(self,obs):
         agents=[]
         new_speed=0
@@ -48,19 +68,7 @@ class CarOrca(Orca):
 
         return agents
 
-    def get_action_from_agents(self,agents, method):
-
-        # 计算orca避障速度
-        new_vels, all_line = self.orca(agents[0], agents[1:], self.tau, self.dt
-                                  , limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain]
-                                  , method=method)
-
-        # 将速度转换为动作指令
-        new_vels[0] = new_vels[0]+1
-        new_vels[1] = new_vels[1] + 0.3
-        action = self.change_vxvy_to_action(agents[0], new_vels)
-        return new_vels,action
-
+    #将正常orca的输出【vx,vy】,转换成车辆使用的控制【油门，转角】
     def change_vxvy_to_action(self,agent:Agent,control_v):
         l=control_v[0]
         # print(agent.position[0],agent.position[1],agent.theta*180/math.pi)
@@ -93,8 +101,24 @@ class CarOrca(Orca):
 
         return action
 
+    #在orca的基础上进行封装，通过agent 的list 获取油门方向盘角度的控制（也有可能是前轮转角）
+    def get_action_from_agents(self,agents, method):
 
-    # et orca_src action from orca_src
+        # 计算orca避障速度
+        new_vels, all_line = self.orca(agents[0], agents[1:], self.tau, self.dt
+                                  , limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain]
+                                  , method=method)
+
+        # 将速度转换为动作指令
+        new_vels[0] = new_vels[0]+1
+        new_vels[1] = new_vels[1] + 0.3
+        action = self.change_vxvy_to_action(agents[0], new_vels)
+        return new_vels,action
+
+    """
+    输入是highway仿真环境的obs，控制方法method
+    输入是车辆油门，方向盘角度
+    """
     def get_action_from_obs(self, obs, method=None):
 
         # 将obs的数据格式转换成orca使用的agents类型
