@@ -1,9 +1,6 @@
 import math
 import numpy as np
 
-from env.highway_sim_env import HighwaySimulation
-
-
 from orca_src.orca import Orca
 from orca_src.class_agent import Agent
 

@@ -36,7 +36,6 @@ class Orca():
         # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
         self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=4, K_D=0.2, K_I=0)
 
-
     def _perp(self,a):
         return array((a[1], -a[0]))
 
