@@ -1,17 +1,9 @@
 import math
 
 import numpy
-from orca_src.pyorca import orca
 
-# from controller import pid_longitudinal_controller
-from orca_src.highway_orca import HighWayOrca
+from orca_src.car_orca import CarOrca
 from env.highway_sim_env import HighwaySimulation
-# import torch as th
-# from stable_baselines3 import PPO
-# from torch.distributions import Categorical
-# import torch
-# import torch.nn as nn
-# from torch.nn import functional as F
 
 """
 切换逻辑主程序部分
@@ -24,15 +16,15 @@ class SwitchLogic():
 
         self.switch_danger_theta = math.pi / 6
         self.switch_danger_dis = 3.5
-
+        self.default_method='orca'
         self.env=env
 
-        self.orca_policy=HighWayOrca(sim_env=self.env,method='orca')
-        self.rl_policy=HighWayOrca(sim_env=self.env,method='avo')
+        self.orca_policy=CarOrca(sim_env=self.env, method='orca')
+        self.rl_policy=CarOrca(sim_env=self.env, method='orca')
 
     #et orca_src action from orca_src
     def get_orca_action(self,obs,method=None):
-        return self.orca_policy.get_orca_action(obs,method)
+        return self.orca_policy.get_action(obs, method)
 
     def get_rl_action(self,model,obs):
         return (0.5,-0.5)
@@ -74,7 +66,7 @@ class SwitchLogic():
         # return True
         return False
 
-    def run(self,switch_count=9999,switch_method='orca_src'):
+    def run(self,switch_count=9999,switch_method='orca'):
 
         action = (0, 0)
         model=None
@@ -129,7 +121,7 @@ class SwitchLogic():
             rl_action=self.get_rl_action(model,obs)
 
             if count<switch_count:
-                orca_action,vel_speed=self.get_orca_action(obs)
+                orca_action,vel_speed=self.get_orca_action(obs,'orca')
             else:
                 orca_action,vel_speed=self.get_orca_action(obs,switch_method)
 

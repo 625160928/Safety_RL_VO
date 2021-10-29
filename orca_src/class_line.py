@@ -1,4 +1,23 @@
 import math
+from numpy import array, sqrt, copysign, dot
+
+class Line(object):
+    """A line in space."""
+    def __init__(self, point, direction):
+        super(Line, self).__init__()
+        self.point = array(point)
+        self.direction = self._normalized(array(direction))
+
+    def __repr__(self):
+        return "Line(%s, %s)" % (self.point, self.direction)
+
+    def _norm_sq(self,x):
+        return dot(x, x)
+
+    def _normalized(self,x):
+        l = self._norm_sq(x)
+        assert l > 0, (x, l)
+        return x / sqrt(l)
 
 #找点到线段最近的点
 def proj_from_point_to_segment(point,line):

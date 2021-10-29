@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 import math
 import time
-from orca_src import line
+from orca_src import class_line
 
 
 def SubPoint(point1, point2):
@@ -48,10 +48,10 @@ def get_min_point_in_tubianxing(point,point_list):
     for i in range(len(point_list)):
         if i==0:
             line=[point_list[0],point_list[len(point_list)-1]]
-            projx,projy= line.proj_from_point_to_segment(point, line)
+            projx,projy= class_line.proj_from_point_to_segment(point, line)
         else:
             line=[point_list[i],point_list[i-1]]
-            projx,projy= line.proj_from_point_to_segment(point, line)
+            projx,projy= class_line.proj_from_point_to_segment(point, line)
         tmp_dist=math.hypot(projx-point[0],projy-point[1])
         if min_dist==None:
             min_dist=tmp_dist
