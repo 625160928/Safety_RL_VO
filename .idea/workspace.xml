@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="" />
+    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="move config param to yaml file">
+      <change afterPath="$PROJECT_DIR$/env/grid_map.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/env/space_change.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Safety_RL_VO.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Safety_RL_VO.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/orca_src/orca.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/orca.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/orca_src/road_orca.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/road_orca.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,10 +36,13 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/env" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/env" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\work\github_folder\VO\vo_update\Safety_RL_VO\orca_src" />
       <recent name="E:\work\github_folder\VO\vo_update\Safety_RL_VO" />
@@ -35,7 +50,7 @@
       <recent name="E:\work\github_folder\VO\vo_update\Safety_RL_VO\car_orca" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.grid_map">
     <configuration name="car_orca" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Safety_RL_VO" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -49,6 +64,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="E:\work\github_folder\VO\vo_update\Safety_RL_VO\orca_src\car_orca.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="grid_map" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Safety_RL_VO" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/env" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/env/grid_map.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -80,6 +116,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.grid_map" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.car_orca" />
       </list>
@@ -94,56 +131,30 @@
       <option name="presentableId" value="Default" />
       <updated>1634529954648</updated>
     </task>
+    <task id="LOCAL-00001" summary="move config param to yaml file">
+      <created>1637134269123</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1637134269123</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="674" y="320" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1635471384806">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="674" y="320" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1635471384806" />
-    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1635471380937">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1635471380937" />
-    <state width="1899" height="279" key="GridCell.Tab.0.bottom" timestamp="1637128232669">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
-    <state width="1899" height="279" key="GridCell.Tab.0.center" timestamp="1637128232669">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
-    <state width="1899" height="279" key="GridCell.Tab.0.left" timestamp="1637128232669">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
-    <state width="1899" height="279" key="GridCell.Tab.0.right" timestamp="1637128232669">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1635476997571">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1635476997571" />
-    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1635476997571">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1635476997571" />
-    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1635476997571">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1635476997571" />
-    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1635476997571">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1635476997571" />
-    <state x="690" y="191" key="SettingsEditor" timestamp="1637128341805">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="690" y="191" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1637128341805" />
-    <state x="515" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1635475945945">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="515" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1040@0.0.1920.1040" timestamp="1635475945945" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="move config param to yaml file" />
+    <option name="LAST_COMMIT_MESSAGE" value="move config param to yaml file" />
   </component>
 </project>

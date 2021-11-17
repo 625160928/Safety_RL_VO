@@ -38,8 +38,8 @@ class RoadOrca(Orca):
 
     #为highway，切换逻辑提供的输出反馈
     #输入的method指使用avo还是orca获取控制，只有【avo，orca】i啷个选择
-    def get_action(self, obs, method=None):
-        return self._get_action_from_obs(obs, method)
+    def get_action(self, obs, method=None,map=None):
+        return self._get_action_from_obs(obs, method,map)
 
     #速度控制器
     #输入为目标速度与当前速度，输出为油门大小
@@ -108,13 +108,11 @@ class RoadOrca(Orca):
         return action
 
     #在orca的基础上进行封装，通过agent 的list 获取油门方向盘角度的控制（也有可能是前轮转角）
-    def _get_action_from_agents(self, agents, method):
-
-        self.limit_range = [-2 + agents[0].radius / 2 + self.edge_remain, 14 - agents[0].radius / 2 - self.edge_remain]
+    def _get_action_from_agents(self, agents, method,grid_map=None):
 
         # 计算orca避障速度
         new_vels, all_line = self.orca(agents[0], agents[1:], self.tau, self.dt
-                                  , method=method)
+                                  , method=method,grid_map=grid_map)
 
         # 将速度转换为动作指令
         new_vels[0] = new_vels[0]+1
@@ -126,7 +124,7 @@ class RoadOrca(Orca):
     输入是highway仿真环境的obs，控制方法method
     输入是车辆油门，方向盘角度
     """
-    def _get_action_from_obs(self, obs, method=None):
+    def _get_action_from_obs(self, obs, method=None,map=None):
 
         # 将obs的数据格式转换成orca使用的agents类型
         agents = []
@@ -145,7 +143,7 @@ class RoadOrca(Orca):
                                                               self.lane * self.lane_length,
                                                               self.prev)
         # 计算orca避障速度
-        new_vels,action=self._get_action_from_agents(agents, method)
+        new_vels,action=self._get_action_from_agents(agents, method,map)
 
         return action, new_vels
 

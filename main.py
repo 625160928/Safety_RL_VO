@@ -5,7 +5,7 @@ import yaml
 
 from orca_src.road_orca import RoadOrca
 from env.highway_sim_env import HighwaySimulation
-
+from env.grid_map import GridMap
 """
 切换逻辑主程序部分
 """
@@ -25,8 +25,8 @@ class SwitchLogic():
         self.rl_policy=RoadOrca(config=config, method='avo')
 
     #et orca_src action from orca_src
-    def get_orca_action(self,obs,method=None):
-        return self.orca_policy.get_action(obs, method)
+    def get_orca_action(self,obs,method=None,map=None):
+        return self.orca_policy.get_action(obs, method,map)
 
     def get_rl_action(self,model,obs):
         return (0.5,-0.5)
@@ -86,6 +86,15 @@ class SwitchLogic():
         old='rl'
         # ========================上面是反馈参数记录
 
+        road_map = GridMap()
+        road_map.x_length = 200
+        road_map.y_length = 20
+        road_map.xy_resolusion = 1
+        road_map.map = road_map.gengerate_map()
+        road_map.zero_y = -2
+        road_map.zero_x = 0
+        road_map.zero_theta = 0
+        road_map.reset_space_change()
 
         while not self.env.done:
             count += 1
@@ -123,18 +132,18 @@ class SwitchLogic():
             rl_action=self.get_rl_action(model,obs)
 
             if count<switch_count:
-                orca_action,vel_speed=self.get_orca_action(obs,self.default_method)
+                orca_action,vel_speed=self.get_orca_action(obs,self.default_method,road_map)
             else:
-                orca_action,vel_speed=self.get_orca_action(obs,switch_method)
+                orca_action,vel_speed=self.get_orca_action(obs,switch_method,road_map)
 
             #预测一段时间后的状态
             predict_env_obs=self.env.env_predict(rl_action,obs)
 
             #获取一段时间后的orca操作，用来作为危险判断参考
             if count<switch_count:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs)
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,road_map)
             else:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,switch_method)
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,switch_method,road_map)
 
             #危险判断，判断一段时间后的状态是否安全
             if self.danger_action(predict_env_obs,pre_vel_speed):
@@ -168,6 +177,9 @@ def main():
     f = open(r'highway_config.yaml', 'r', encoding='utf-8')
     result = f.read()
     config = yaml.load(result)
+
+
+
 
 
     sim_env=HighwaySimulation(config)

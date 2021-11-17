@@ -47,19 +47,18 @@ class Orca():
         return  [math.cos(theta)*v,  math.sin(theta)*v]
 
 
-    def orca(self,agent, colliding_agents, t, dt,  method='orca'):
+    def orca(self,agent, colliding_agents, t, dt,  method='orca',grid_map=None):
         """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
         changed on tick *edge*, like first-order integration, otherwise the method
         undercompensates and you will still risk colliding."""
         # print('orca_src ',colliding_agents)
-        limit = self.limit_range
         lines = []
         for collider in colliding_agents:
             # print(collider)
             if method == "avo":
                 dv, n = self.get_avo_avoidance_velocity(agent, collider, t, dt)
             else:
-                dv, n = self.get_car_orca_avoidance_velocity(agent, collider, t, dt, limit)
+                dv, n = self.get_car_orca_avoidance_velocity(agent, collider, t, dt, grid_map)
 
             line = Line(agent.velocity + dv, n)  # 这里本来应该是个个体都要有一半的避障责任（dv/2）
             lines.append(line)
@@ -164,7 +163,7 @@ class Orca():
             n = self._normalized(-x)
         return u, n
 
-    def get_car_orca_avoidance_velocity(self,agent:Agent, collider, t, dt, limit):
+    def get_car_orca_avoidance_velocity(self,agent:Agent, collider, t, dt, grid_map):
 
         x = -(agent.position - collider.position)
         v = agent.velocity - collider.velocity
@@ -173,21 +172,13 @@ class Orca():
         x_len_sq = self._norm_sq(x)
 
         if x_len_sq >= r * r:
-            collider_aviliable_speed_set = self.get_car_aviliable_speed(collider, t, limit)
+            collider_aviliable_speed_set = self.get_car_aviliable_speed(collider, t, grid_map)
             unino_agent_collide_speed_set = self.get_agent_collide_set(agent, collider, t)
             agent_collide_set = Minkowski.Minkowski_sum(collider_aviliable_speed_set, unino_agent_collide_speed_set)
             u, n = self.get_dv_n_from_tubianxing(agent.velocity, agent_collide_set)
 
 
         else:
-            # We're already intersecting. Pick the closest velocity to our
-            # velocity that will get us out of the collision within the next
-            # timestep.
-            # print("intersecting")
-            # w = -v - x/dt
-            # u = (normalized(w) * r/dt - w)
-            # n =( normalized(w))
-            # if 1:
             w = -v - x / dt
             u = w
             n = self._normalized(-x)
@@ -346,7 +337,7 @@ class Orca():
         # print(ans)
         return ans
 
-    def get_car_aviliable_speed(self, collider: Agent, t, limit):
+    def get_car_aviliable_speed(self, collider: Agent, t, grid_map):
         houxuan = collider.radius * 2 / 4
         up_range = limit[1]
         down_range = limit[0]
