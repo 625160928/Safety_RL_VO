@@ -305,8 +305,10 @@ class Orca():
         for v in v_arr:
             dy = agent.position[1] + v[1] * dt * 3
             dx = agent.position[0] + v[0] * dt * 3
+
             if grid_map.check_collision(dx,dy,0)==True:
                 v_arr.remove(v)
+
         return v_arr
 
     def get_car_posiable_speed_car(self,agent: Agent):

@@ -142,6 +142,7 @@ class SwitchLogic():
 
             #update map
             road_map.zero_x=obs[0][1]-100
+            road_map.reset_space_change()
 
 
             #获取当前时刻下的orca操作与rl操作
