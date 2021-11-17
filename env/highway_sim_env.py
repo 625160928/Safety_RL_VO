@@ -7,20 +7,21 @@ import gym
 import highway_env
 
 class HighwaySimulation():
-    def __init__(self,seed):
+    def __init__(self,config):
         #参数
-        self.policy_frequency = 10
-        self.dt = 0.05
-        self.tau = 2
-        self.prev = 20
-        self.config = {
-            "lanes_count": 3,
+        self.parm_config=config
+        self.policy_frequency = config['policy_frequency']
+        self.dt = config['dt']
+        self.tau = config['tau']
+        self.prev =config['prev']
+        self.sim_env_config = {
+            "lanes_count": config['lanes_count'],
             "ego_spacing": 1,
-            'vehicles_count': 15,
+            'vehicles_count': config['vehicles_count'],
             'simulation_frequency': 1 / self.dt,  # 20
-            'vehicles_density': 1.5,
+            'vehicles_density': config['vehicles_density'],
             "policy_frequency": self.policy_frequency,  # 10
-            "duration": 200,
+            "duration": config['duration'],
             "observation": {
                 "type": "Kinematics",
                 "vehicles_count": 6,
@@ -31,14 +32,14 @@ class HighwaySimulation():
             },
             "action": {
                 "type": "ContinuousAction",
-                "STEERING_RANGE": (-np.pi / 3, np.pi / 3)
+                "STEERING_RANGE": (-config['car_steer_limit'], config['car_steer_limit'])
             }
         }
 
         #仿真环境
         self.env = gym.make("highway-v0")
         self.done = False
-        self.env.seed(seed)
+        self.env.seed(config['seed'])
         self.predict_time = 2
         self.pose = []
         self.pred = []
@@ -50,7 +51,7 @@ class HighwaySimulation():
         return obs, reward, self.done, info
 
     def reinit(self):
-        self.env.configure(self.config)
+        self.env.configure(self.sim_env_config)
         self.env.reset()
         controller_vehicle=self.env.vehicle
         controller_vehicle.position=controller_vehicle.position+np.array([-9,0])

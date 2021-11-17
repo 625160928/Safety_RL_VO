@@ -1,1 +1,34 @@
-car_steer_limit: 3.14/3
+#env_parm
+seed: 10
+dt: 0.05
+tau: 2
+lanes_count: 3
+duration: 200
+vehicles_density: 1.5
+vehicles_count: 20
+policy_frequency: 10
+acc: 0.5
+lane: 1
+lane_length: 4
+edge_remain: 0.3
+
+#orca speed controller parm
+Speed_Kp: 0.6
+
+#car orca parm
+
+#orca parm
+save_dis: 1.5
+save_reward: 0.5
+car_radiu: 3.2
+
+#car parm
+car_steer_limit: 1.04 #3.14/3
+prev: 20
+
+
+#switch logic parm
+switch_danger_theta: 0.52  #math.pi / 6
+switch_danger_dis: 3.5
+default_method: 'orca'
+

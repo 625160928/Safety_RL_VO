@@ -4,6 +4,7 @@ import numpy as np
 from orca_src.orca import Orca
 from orca_src.class_agent import Agent
 
+from controller import pid_lateral_controller_angle
 
 """
 【类名】：CarOrca
@@ -20,13 +21,20 @@ from orca_src.class_agent import Agent
 
 
 """
-class CarOrca(Orca):
+class RoadOrca(Orca):
     #目前输入的sim_env是一整个环境，但实际上只可以用其中的参数
     #没对环境做保护，所以尽量不要调用env的render，step等方法
-    def __init__(self,sim_env=None,method='orca'):
-        Orca.__init__(self,method=method)
-        self.env=sim_env
+    def __init__(self,config=None,method='orca'):
+        Orca.__init__(self,config=config,method=method)
         self.done = False
+        self.Speed_Kp = config['Speed_Kp']
+        self.edge_remain=config['edge_remain']
+        self.car_radiu=config['car_radiu']
+        self.lane=config['lane']
+        self.lane_length=config['lane_length']
+        self.acc=config['acc']
+
+        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=4, K_D=0.2, K_I=0)
 
     #为highway，切换逻辑提供的输出反馈
     #输入的method指使用avo还是orca获取控制，只有【avo，orca】i啷个选择

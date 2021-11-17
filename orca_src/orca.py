@@ -6,7 +6,6 @@ from numpy import array, sqrt, copysign, dot
 from numpy.linalg import det
 
 
-from controller import pid_lateral_controller_angle
 from orca_src.class_line import Line
 from orca_src.Minkowski import Minkowski_sum
 from orca_src.class_agent import Agent
@@ -14,27 +13,20 @@ from orca_src import Minkowski, tubianxing
 
 
 class Orca():
-    def __init__(self,method='orca'):
-        self.car_steer_limit=math.pi/3
-        self.acc = 0.5
-        self.tau = 2
-        self.dt=0.05
-        self.prev = 20
-        self.lane=1
-        self.lane_length=4
+    def __init__(self,config=None,method='orca'):
+
+        self.car_steer_limit=config['car_steer_limit']
+        self.dt = config['dt']
+        self.tau = config['tau']
+        self.prev =config['prev']
+
         self.limit_range=[-20,34]
 
-        self.save_dis = 1.5
-        self.save_reward = 0.5
+        self.save_dis = config['save_dis']
+        self.save_reward = config['save_reward']
 
-        # 速度P控制器系数 1
-        self.Speed_Kp = 0.6
-        self.car_radiu=3.2
         self.method=method
-        self.edge_remain=0.3
 
-        # self.long_pid=pid_longitudinal_controller.PIDLongitudinalController( K_P=1.0, K_D=0.0, K_I=0.0)
-        self.later_pid=pid_lateral_controller_angle.PIDLateralController(L=2.5, dt=self.dt, car_steer_limit=self.car_steer_limit, K_P=4, K_D=0.2, K_I=0)
 
     def _perp(self,a):
         return array((a[1], -a[0]))

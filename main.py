@@ -1,9 +1,9 @@
 import math
 
 import numpy
-import pyyaml
+import yaml
 
-from orca_src.car_orca import CarOrca
+from orca_src.road_orca import RoadOrca
 from env.highway_sim_env import HighwaySimulation
 
 """
@@ -12,21 +12,17 @@ from env.highway_sim_env import HighwaySimulation
 
 class SwitchLogic():
     def __init__(self,env=None):
-        f = open(r'highway_config.yaml', 'r', encoding='utf-8')
-        result = f.read()
-
-        a = pyyaml.load(result)
-        print(a)
+        config=env.parm_config
         #车辆模型参数
-        self.car_steer_limit = math.pi / 3
+        self.car_steer_limit = config['car_steer_limit']
 
-        self.switch_danger_theta = math.pi / 6
-        self.switch_danger_dis = 3.5
-        self.default_method='orca'
+        self.switch_danger_theta = config['switch_danger_theta']
+        self.switch_danger_dis = config['switch_danger_dis']
+        self.default_method=config['default_method']
         self.env=env
 
-        self.orca_policy=CarOrca(sim_env=self.env, method='orca')
-        self.rl_policy=CarOrca(sim_env=self.env, method='avo')
+        self.orca_policy=RoadOrca(config=config, method=self.default_method)
+        self.rl_policy=RoadOrca(config=config, method='avo')
 
     #et orca_src action from orca_src
     def get_orca_action(self,obs,method=None):
@@ -169,7 +165,12 @@ class SwitchLogic():
 
 
 def main():
-    sim_env=HighwaySimulation(10)
+    f = open(r'highway_config.yaml', 'r', encoding='utf-8')
+    result = f.read()
+    config = yaml.load(result)
+
+
+    sim_env=HighwaySimulation(config)
     new_highway_orca=SwitchLogic(sim_env)
     new_highway_orca.run()
 
