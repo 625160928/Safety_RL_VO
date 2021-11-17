@@ -46,7 +46,8 @@ class CarOrca(Orca):
         agent=Agent(position,velocity, self.car_radiu,  self.acc, (obj[3], obj[4]),theta=math.atan2(obj[6],obj[5]))
         # if math.atan2(obj[6],obj[5])!=0:
         #     print('obj ', obj, '  theta ', math.atan2(obj[6], obj[5]))
-        vx,vy= self.get_vxvy_from_agent(agent)
+        vx= agent.velocity[0] * np.cos(agent.theta )
+        vy=agent.velocity[0] * np.sin(agent.theta )
         agent.velocity=np.array((vx,vy))
         return agent
 
@@ -101,9 +102,10 @@ class CarOrca(Orca):
     #在orca的基础上进行封装，通过agent 的list 获取油门方向盘角度的控制（也有可能是前轮转角）
     def _get_action_from_agents(self, agents, method):
 
+        self.limit_range = [-2 + agents[0].radius / 2 + self.edge_remain, 14 - agents[0].radius / 2 - self.edge_remain]
+
         # 计算orca避障速度
         new_vels, all_line = self.orca(agents[0], agents[1:], self.tau, self.dt
-                                  , limit=[-2+agents[0].radius/2+self.edge_remain,14-agents[0].radius/2-self.edge_remain]
                                   , method=method)
 
         # 将速度转换为动作指令

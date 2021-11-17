@@ -105,22 +105,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1635471380937" />
-    <state width="1899" height="279" key="GridCell.Tab.0.bottom" timestamp="1635483892596">
+    <state width="1899" height="279" key="GridCell.Tab.0.bottom" timestamp="1637128232669">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1635483892596" />
-    <state width="1899" height="279" key="GridCell.Tab.0.center" timestamp="1635483892596">
+    <state width="1899" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
+    <state width="1899" height="279" key="GridCell.Tab.0.center" timestamp="1637128232669">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1635483892596" />
-    <state width="1899" height="279" key="GridCell.Tab.0.left" timestamp="1635483892596">
+    <state width="1899" height="279" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
+    <state width="1899" height="279" key="GridCell.Tab.0.left" timestamp="1637128232669">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1635483892596" />
-    <state width="1899" height="279" key="GridCell.Tab.0.right" timestamp="1635483892596">
+    <state width="1899" height="279" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
+    <state width="1899" height="279" key="GridCell.Tab.0.right" timestamp="1637128232669">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="279" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1635483892596" />
+    <state width="1899" height="279" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1637128232669" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1635476997571">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -137,44 +137,13 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1635476997571" />
-    <state x="690" y="191" key="SettingsEditor" timestamp="1634607242887">
+    <state x="690" y="191" key="SettingsEditor" timestamp="1637128341805">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="191" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1634607242887" />
+    <state x="690" y="191" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1637128341805" />
     <state x="515" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1635475945945">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="515" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1040@0.0.1920.1040" timestamp="1635475945945" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/orca_src/orca.py</url>
-          <line>73</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>122</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/orca_src/orca.py</url>
-          <line>77</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>123</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>125</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

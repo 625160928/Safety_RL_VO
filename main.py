@@ -1,6 +1,7 @@
 import math
 
 import numpy
+import pyyaml
 
 from orca_src.car_orca import CarOrca
 from env.highway_sim_env import HighwaySimulation
@@ -11,6 +12,11 @@ from env.highway_sim_env import HighwaySimulation
 
 class SwitchLogic():
     def __init__(self,env=None):
+        f = open(r'highway_config.yaml', 'r', encoding='utf-8')
+        result = f.read()
+
+        a = pyyaml.load(result)
+        print(a)
         #车辆模型参数
         self.car_steer_limit = math.pi / 3
 
@@ -20,7 +26,7 @@ class SwitchLogic():
         self.env=env
 
         self.orca_policy=CarOrca(sim_env=self.env, method='orca')
-        self.rl_policy=CarOrca(sim_env=self.env, method='orca')
+        self.rl_policy=CarOrca(sim_env=self.env, method='avo')
 
     #et orca_src action from orca_src
     def get_orca_action(self,obs,method=None):
@@ -121,7 +127,7 @@ class SwitchLogic():
             rl_action=self.get_rl_action(model,obs)
 
             if count<switch_count:
-                orca_action,vel_speed=self.get_orca_action(obs,'orca')
+                orca_action,vel_speed=self.get_orca_action(obs,self.default_method)
             else:
                 orca_action,vel_speed=self.get_orca_action(obs,switch_method)
 
@@ -136,18 +142,18 @@ class SwitchLogic():
 
             #危险判断，判断一段时间后的状态是否安全
             if self.danger_action(predict_env_obs,pre_vel_speed):
-                # print('danger, choose ORCA action')
+                print('danger, choose ORCA action')
                 action=orca_action
                 if old=='rl':
                     switch_times+=1
                     old="orca_src"
 
             else:
+                print('save, choose RL action')
                 rl_count+=1
                 if old=='orca_src':
                     switch_times+=1
                     old="rl"
-                # print('save, choose RL action')
                 action=rl_action
 
             #环境迭代

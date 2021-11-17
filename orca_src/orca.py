@@ -54,41 +54,31 @@ class Orca():
         theta = math.atan2(goal_y - current_y, goal_x - current_x)
         return  [math.cos(theta)*v,  math.sin(theta)*v]
 
-    def get_vxvy_from_agent(self,agent: Agent):
 
-        beta = np.arctan(1 / 2 * np.tan(agent.velocity[1]))
-        # print('pre pose ',agent.position[0]+agent.velocity[0] *np.cos(agent.theta + beta)*0.02,agent.position[1]+agent.velocity[1] *np.cos(agent.theta + beta)*0.02)
-        beta = 0
-
-        return agent.velocity[0] * np.cos(agent.theta + beta), agent.velocity[0] * np.sin(agent.theta + beta)
-
-    def orca(self,agent, colliding_agents, t, dt, limit=None, method='orca'):
+    def orca(self,agent, colliding_agents, t, dt,  method='orca'):
         """Compute ORCA solution for agent. NOTE: velocity must be _instantly_
         changed on tick *edge*, like first-order integration, otherwise the method
         undercompensates and you will still risk colliding."""
         # print('orca_src ',colliding_agents)
-        if limit is None:
-            limit = self.limit_range
-        else:
-            self.limit_range = limit
+        limit = self.limit_range
         lines = []
         for collider in colliding_agents:
             # print(collider)
             if method == "avo":
-                dv, n = self.get_avoidance_velocity(agent, collider, t, dt)
+                dv, n = self.get_avo_avoidance_velocity(agent, collider, t, dt)
             else:
                 dv, n = self.get_car_orca_avoidance_velocity(agent, collider, t, dt, limit)
 
             line = Line(agent.velocity + dv, n)  # 这里本来应该是个个体都要有一半的避障责任（dv/2）
             lines.append(line)
             # print('collider ',collider.position,collider.velocity,' -- to line ',agent.velocity + dv / 2, n)
-        lines.append(Line([0, limit[0] - agent.position[1]], [0, 1]))
-        lines.append(Line([0, limit[1] - agent.position[1]], [0, -1]))
+        # lines.append(Line([0, limit[0] - agent.position[1]], [0, 1]))
+        # lines.append(Line([0, limit[1] - agent.position[1]], [0, -1]))
 
         # velo
-        return self.speed_optimize(lines, agent, t, dt, limit), lines
+        return self.speed_optimize(lines, agent, t, dt), lines
 
-    def get_avoidance_velocity(self,agent, collider, t, dt):
+    def get_avo_avoidance_velocity(self, agent, collider, t, dt):
         """Get the smallest relative change in velocity between agent and collider
         that will get them onto the boundary of each other's velocity obstacle
         (VO), and thus avert collision."""
@@ -211,14 +201,12 @@ class Orca():
             n = self._normalized(-x)
         return u, n
 
-    def speed_optimize(self,lines, agent, t, dt, limit):
+    def speed_optimize(self,lines, agent, t, dt):
         contorl_arr = []
         reward_arr = []
-        control_v_arr = []
-        init_vx, init_vy = self.get_vxvy_from_agent(agent)
 
         control_v_arr = self.get_car_posiable_speed_car(agent)
-        control_v_arr = self.limit_v_choose(control_v_arr, agent, dt, limit)
+        control_v_arr = self.limit_v_choose(control_v_arr, agent, dt)
 
         for i in range(len(control_v_arr)):
             tmp_vx = control_v_arr[i][0]
@@ -330,7 +318,8 @@ class Orca():
             return 999
         return 0
 
-    def limit_v_choose(self,v_arr, agent, dt, limit):
+    def limit_v_choose(self,v_arr, agent, dt):
+        limit=self.limit_range
         for v in v_arr:
             dy = agent.position[1] + v[1] * dt * 3
             if dy < limit[0] or dy > limit[1]:
@@ -483,6 +472,9 @@ class Orca():
         re_rank = tmp_reward[0]
         reward = w_speed * re_speed + w_orca * re_orca + w_rank * re_rank
         return reward
+
+
+
 
     def draw_orca_collider(self,agent, collider, t, dt,limit):
         from orca_src import draw_picture
