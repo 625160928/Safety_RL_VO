@@ -14,7 +14,7 @@ from orca_src import Minkowski, tubianxing
 
 class Orca():
     def __init__(self,config=None,method='orca'):
-
+        self.config=config
         self.car_steer_limit=config['car_steer_limit']
         self.dt = config['dt']
         self.tau = config['tau']
@@ -58,7 +58,7 @@ class Orca():
             if method == "avo":
                 dv, n = self.get_avo_avoidance_velocity(agent, collider, t, dt)
             else:
-                dv, n = self.get_car_orca_avoidance_velocity(agent, collider, t, dt, grid_map)
+                dv, n = self.get_car_orca_avoidance_velocity(agent, collider, t, dt)
 
             line = Line(agent.velocity + dv, n)  # 这里本来应该是个个体都要有一半的避障责任（dv/2）
             lines.append(line)
@@ -67,7 +67,7 @@ class Orca():
         # lines.append(Line([0, limit[1] - agent.position[1]], [0, -1]))
 
         # velo
-        return self.speed_optimize(lines, agent, t, dt), lines
+        return self.speed_optimize(lines, agent, t, dt,grid_map), lines
 
     def get_avo_avoidance_velocity(self, agent, collider, t, dt):
         """Get the smallest relative change in velocity between agent and collider
@@ -163,7 +163,7 @@ class Orca():
             n = self._normalized(-x)
         return u, n
 
-    def get_car_orca_avoidance_velocity(self,agent:Agent, collider, t, dt, grid_map):
+    def get_car_orca_avoidance_velocity(self,agent:Agent, collider, t, dt):
 
         x = -(agent.position - collider.position)
         v = agent.velocity - collider.velocity
@@ -172,7 +172,7 @@ class Orca():
         x_len_sq = self._norm_sq(x)
 
         if x_len_sq >= r * r:
-            collider_aviliable_speed_set = self.get_car_aviliable_speed(collider, t, grid_map)
+            collider_aviliable_speed_set = self.get_car_aviliable_speed(collider, t)
             unino_agent_collide_speed_set = self.get_agent_collide_set(agent, collider, t)
             agent_collide_set = Minkowski.Minkowski_sum(collider_aviliable_speed_set, unino_agent_collide_speed_set)
             u, n = self.get_dv_n_from_tubianxing(agent.velocity, agent_collide_set)
@@ -184,12 +184,12 @@ class Orca():
             n = self._normalized(-x)
         return u, n
 
-    def speed_optimize(self,lines, agent, t, dt):
+    def speed_optimize(self,lines, agent, t, dt,grid_map=None):
         contorl_arr = []
         reward_arr = []
 
         control_v_arr = self.get_car_posiable_speed_car(agent)
-        control_v_arr = self.limit_v_choose(control_v_arr, agent, dt)
+        control_v_arr = self.delete_v_not_in_map(control_v_arr, agent, dt, grid_map)
 
         for i in range(len(control_v_arr)):
             tmp_vx = control_v_arr[i][0]
@@ -301,11 +301,11 @@ class Orca():
             return 999
         return 0
 
-    def limit_v_choose(self,v_arr, agent, dt):
-        limit=self.limit_range
+    def delete_v_not_in_map(self, v_arr, agent, dt, grid_map=None):
         for v in v_arr:
             dy = agent.position[1] + v[1] * dt * 3
-            if dy < limit[0] or dy > limit[1]:
+            dx = agent.position[0] + v[0] * dt * 3
+            if grid_map.check_collision(dx,dy,0)==True:
                 v_arr.remove(v)
         return v_arr
 
@@ -337,53 +337,21 @@ class Orca():
         # print(ans)
         return ans
 
-    def get_car_aviliable_speed(self, collider: Agent, t, grid_map):
-        houxuan = collider.radius * 2 / 4
-        up_range = limit[1]
-        down_range = limit[0]
-        min_turning_radiu = 15
+    def get_car_aviliable_speed(self, collider: Agent, t):
+        min_turning_radiu = self.config['min_turning_radiu']
         # print('collider.theta ',collider.theta)
 
         s_max = collider.velocity[0] * t + 1 / 2 * collider.max_speed * t * t
         speedmax_theta = s_max / min_turning_radiu
 
         # 求车辆朝着y值增加的方向转弯所能转过的最大角
-        o_up = [collider.position[0] - min_turning_radiu * math.sin(collider.theta),
-                collider.position[1] + min_turning_radiu * math.cos(collider.theta)]
-        if o_up[1] > up_range:
-            o_up_turn_cos_theta = (o_up[1] - up_range) / min_turning_radiu
-            if o_up_turn_cos_theta > 1:
-                o_up_turn_cos_theta = 1
-            if o_up_turn_cos_theta < -1:
-                o_up_turn_cos_theta = -1
-            o_up_theta = math.acos(o_up_turn_cos_theta) - collider.theta
-        else:
-            o_up_turn_cos_theta = (up_range - o_up[1]) / min_turning_radiu
-            if o_up_turn_cos_theta > 1:
-                o_up_turn_cos_theta = 1
-            if o_up_turn_cos_theta < -1:
-                o_up_turn_cos_theta = -1
-            o_up_theta = math.pi - math.acos(o_up_turn_cos_theta) - collider.theta
-
+        o_up_theta =self.config['npc_car_steer_limit']
         up_theta_limit = min(o_up_theta, speedmax_theta)
 
-        # 求车辆朝着y值ecreace的方向转弯所能转过的最大角
+        # 求车辆朝着y值decreace的方向转弯所能转过的最大角
         o_down = [collider.position[0] + min_turning_radiu * math.sin(collider.theta),
                   collider.position[1] - min_turning_radiu * math.cos(collider.theta)]
-        if o_down[1] < down_range:
-            o_down_turn_cos_theta = (down_range - o_down[1]) / min_turning_radiu
-            if o_down_turn_cos_theta > 1:
-                o_down_turn_cos_theta = 1
-            if o_down_turn_cos_theta < -1:
-                o_down_turn_cos_theta = -1
-            o_down_theta = math.acos(o_down_turn_cos_theta) + collider.theta
-        else:
-            o_down_turn_cos_theta = -(down_range - o_down[1]) / min_turning_radiu
-            if o_down_turn_cos_theta > 1:
-                o_down_turn_cos_theta = 1
-            if o_down_turn_cos_theta < -1:
-                o_down_turn_cos_theta = -1
-            o_down_theta = math.pi - math.acos(o_down_turn_cos_theta) + collider.theta
+        o_down_theta =self.config['npc_car_steer_limit']
         down_theta_limit = min(o_down_theta, speedmax_theta)
 
         # zuo you bian ti xing de chang du
@@ -470,7 +438,7 @@ class Orca():
         if x_len_sq < r * r:
             return None,None
         print('agent ',agent.position,agent.velocity,' collider',collider.position,collider.velocity)
-        collider_aviliable_speed_set= self.get_car_aviliable_speed(collider, t, limit)
+        collider_aviliable_speed_set= self.get_car_aviliable_speed(collider, t)
         unino_agent_collide_speed_set= self.get_agent_collide_set(agent, collider, t)
         agent_collide_set= Minkowski_sum(collider_aviliable_speed_set, unino_agent_collide_speed_set)
         u,n= self.get_dv_n_from_tubianxing(agent.velocity, agent_collide_set)

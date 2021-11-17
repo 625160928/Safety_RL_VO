@@ -13,6 +13,7 @@ from env.grid_map import GridMap
 class SwitchLogic():
     def __init__(self,env=None):
         config=env.parm_config
+
         #车辆模型参数
         self.car_steer_limit = config['car_steer_limit']
 
@@ -28,7 +29,7 @@ class SwitchLogic():
     def get_orca_action(self,obs,method=None,map=None):
         return self.orca_policy.get_action(obs, method,map)
 
-    def get_rl_action(self,model,obs):
+    def get_rl_action(self,model,obs,road_map):
         return (0.5,-0.5)
 
     def danger_action(self,env_obs,orca_speed):
@@ -86,15 +87,26 @@ class SwitchLogic():
         old='rl'
         # ========================上面是反馈参数记录
 
+
+        # ========================下面是map
+
         road_map = GridMap()
         road_map.x_length = 200
-        road_map.y_length = 20
+        road_map.y_length = 30
         road_map.xy_resolusion = 1
         road_map.map = road_map.gengerate_map()
-        road_map.zero_y = -2
+        road_map.zero_y = -5
         road_map.zero_x = 0
         road_map.zero_theta = 0
         road_map.reset_space_change()
+
+        for i in range(road_map.map.shape[0]):
+            for j in range(road_map.map.shape[1]):
+                if j*road_map.xy_resolusion+road_map.zero_y <-self.env.parm_config['lane_length']/2\
+                        or j*road_map.xy_resolusion+road_map.zero_y >self.env.parm_config['lane_length']*self.env.parm_config['lanes_count']-self.env.parm_config['lane_length']/2:
+
+                    road_map.map[i][j]=1
+        # ========================上面是map
 
         while not self.env.done:
             count += 1
@@ -128,8 +140,13 @@ class SwitchLogic():
                     crash=True
                 break
 
+            #update map
+            road_map.zero_x=obs[0][1]-100
+            print(road_map.zero_x)
+
+
             #获取当前时刻下的orca操作与rl操作
-            rl_action=self.get_rl_action(model,obs)
+            rl_action=self.get_rl_action(model,obs,road_map)
 
             if count<switch_count:
                 orca_action,vel_speed=self.get_orca_action(obs,self.default_method,road_map)
@@ -141,9 +158,9 @@ class SwitchLogic():
 
             #获取一段时间后的orca操作，用来作为危险判断参考
             if count<switch_count:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,road_map)
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,map=road_map)
             else:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,switch_method,road_map)
+                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,method=switch_method,map=road_map)
 
             #危险判断，判断一段时间后的状态是否安全
             if self.danger_action(predict_env_obs,pre_vel_speed):

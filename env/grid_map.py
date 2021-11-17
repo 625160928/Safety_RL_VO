@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-import space_change
+from env import space_change
 
 class GridMap():
     def __init__(self):

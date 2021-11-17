@@ -4,7 +4,7 @@ dt: 0.05
 tau: 2
 lanes_count: 3
 duration: 200
-vehicles_density: 1.5
+vehicles_density: 1
 vehicles_count: 20
 policy_frequency: 10
 acc: 0.5
@@ -24,7 +24,11 @@ car_radiu: 3.2
 
 #car parm
 car_steer_limit: 1.04 #3.14/3
+npc_car_steer_limit: 1.5 #3.14/2
+
 prev: 20
+min_turning_radiu: 15
+
 
 
 #switch logic parm

@@ -124,7 +124,7 @@ class RoadOrca(Orca):
     输入是highway仿真环境的obs，控制方法method
     输入是车辆油门，方向盘角度
     """
-    def _get_action_from_obs(self, obs, method=None,map=None):
+    def _get_action_from_obs(self, obs, method=None, grid_map=None):
 
         # 将obs的数据格式转换成orca使用的agents类型
         agents = []
@@ -143,7 +143,7 @@ class RoadOrca(Orca):
                                                               self.lane * self.lane_length,
                                                               self.prev)
         # 计算orca避障速度
-        new_vels,action=self._get_action_from_agents(agents, method,map)
+        new_vels,action=self._get_action_from_agents(agents, method, grid_map)
 
         return action, new_vels
 
