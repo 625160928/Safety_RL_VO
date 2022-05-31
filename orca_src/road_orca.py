@@ -4,6 +4,8 @@ import numpy as np
 from orca_src.orca import Orca
 from orca_src.class_agent import Agent
 
+from orca_src.Minkowski import Minkowski_sum
+
 from controller import pid_lateral_controller_angle
 
 """
@@ -147,6 +149,30 @@ class RoadOrca(Orca):
 
         return action, new_vels
 
+    def get_position_avaliable_set(self, obj, t):
+        tmp_agent=self._get_agent_from_obj(obj)
+        r=tmp_agent.radius
+        avalivable_set=self.get_car_aviliable_speed(tmp_agent,self.tau*t)
+        car_model=[[-r,-r],[-r,r],[r,r],[r,-r]]
+        mink_sum=Minkowski_sum(car_model,avalivable_set)
+        # print("===============")
+        # print('[',end='')
+        # for point in avalivable_set:
+        #     print('[',point[0],',',point[1],']',end=',')
+        # print(']')
+        #
+        # print('[',end='')
+        # for point in car_model:
+        #     print('[',point[0],',',point[1],']',end=',')
+        # print(']')
+        #
+        #
+        # print('[',end='')
+        # for point in mink_sum:
+        #     print('[',point[0],',',point[1],']',end=',')
+        # print(']')
+
+        return mink_sum
 
 def main():
     #此处的运行实例看旧版本的highway

@@ -6,6 +6,8 @@ import yaml
 from orca_src.road_orca import RoadOrca
 from env.highway_sim_env import HighwaySimulation
 from env.grid_map import GridMap
+from orca_src.tubianxing import Is_rec_collide
+
 """
 切换逻辑主程序部分
 """
@@ -32,10 +34,10 @@ class SwitchLogic():
     def get_rl_action(self,model,obs,road_map):
         return (0.5,-0.5)
 
-    def danger_action(self,env_obs,orca_speed):
+    def danger_action(self, pre_env_obs, orca_speed):
 
-        now_speed_x=env_obs[0][3]
-        now_speed_y=env_obs[0][4]
+        now_speed_x=pre_env_obs[0][3]
+        now_speed_y=pre_env_obs[0][4]
         derta_speed_x=orca_speed[0]-now_speed_x
         derta_speed_y=orca_speed[1]-now_speed_y
 
@@ -67,6 +69,32 @@ class SwitchLogic():
             return True
 
         # return True
+        return False
+
+    def orac_t_danger_action(self, obs, orca_speed):
+
+        my_agent_area=self.orca_policy.get_position_avaliable_set(obs[0], t=1)
+        others_agent_area=[]
+        for obj in obs[1:]:
+            ag=self.orca_policy.get_position_avaliable_set(obj, t=1)
+            others_agent_area.append(ag)
+
+
+        for area in others_agent_area:
+            if Is_rec_collide(area, my_agent_area)==True:
+                print('type - 1 ',area, my_agent_area)
+                return True
+
+        my_agent_area = self.orca_policy.get_position_avaliable_set(obs[0], t=2)
+        others_agent_area = []
+        for obj in obs[1:]:
+            ag = self.orca_policy.get_position_avaliable_set(obj, t=2)
+            others_agent_area.append(ag)
+
+        for area in others_agent_area:
+            if Is_rec_collide(area, my_agent_area)==True:
+                print('type - 2 ',area, my_agent_area)
+                return True
         return False
 
     def run(self,switch_count=9999,switch_method='orca'):
@@ -163,7 +191,8 @@ class SwitchLogic():
                 predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,method=switch_method,map=road_map)
 
             #危险判断，判断一段时间后的状态是否安全
-            if self.danger_action(predict_env_obs,pre_vel_speed):
+            # if self.danger_action(pre_env_obs=predict_env_obs, orca_speed=pre_vel_speed):
+            if self.orac_t_danger_action(obs=obs, orca_speed=orca_action):
                 print('danger, choose ORCA action')
                 action=orca_action
                 if old=='rl':
@@ -193,7 +222,7 @@ class SwitchLogic():
 def main():
     f = open(r'highway_config.yaml', 'r', encoding='utf-8')
     result = f.read()
-    config = yaml.load(result)
+    config = yaml.load(result,Loader=yaml.CLoader)
 
 
 
