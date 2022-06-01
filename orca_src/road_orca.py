@@ -153,14 +153,17 @@ class RoadOrca(Orca):
         tmp_agent=self._get_agent_from_obj(obj)
         r=tmp_agent.radius
         avalivable_set=self.get_car_aviliable_speed(tmp_agent,self.tau*t)
+        for i in avalivable_set:
+            i+=tmp_agent.position
         car_model=[[-r,-r],[-r,r],[r,r],[r,-r]]
         mink_sum=Minkowski_sum(car_model,avalivable_set)
         # print("===============")
+        # print(tmp_agent)
         # print('[',end='')
         # for point in avalivable_set:
         #     print('[',point[0],',',point[1],']',end=',')
         # print(']')
-        #
+
         # print('[',end='')
         # for point in car_model:
         #     print('[',point[0],',',point[1],']',end=',')

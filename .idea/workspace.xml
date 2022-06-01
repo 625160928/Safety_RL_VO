@@ -22,14 +22,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="try add map v1">
-      <change beforePath="$PROJECT_DIR$/.idea/Safety_RL_VO.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Safety_RL_VO.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orca_src/Minkowski.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/Minkowski.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/orca_src/road_orca.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/road_orca.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orca_src/tubianxing.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/tubianxing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637144773919</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）">
+      <created>1653987463713</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1653987463713</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -240,25 +243,30 @@
     <MESSAGE value="try add map v0.1" />
     <MESSAGE value="try add map v0.2" />
     <MESSAGE value="try add map v1" />
-    <option name="LAST_COMMIT_MESSAGE" value="try add map v1" />
+    <MESSAGE value="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）" />
+    <option name="LAST_COMMIT_MESSAGE" value="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1899" height="258" key="GridCell.Tab.0.bottom" timestamp="1653987272827">
+    <state width="1899" height="258" key="GridCell.Tab.0.bottom" timestamp="1654063920956">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1653987272827" />
-    <state width="1899" height="258" key="GridCell.Tab.0.center" timestamp="1653987272826">
+    <state width="1899" height="258" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
+    <state width="1899" height="258" key="GridCell.Tab.0.center" timestamp="1654063920956">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1653987272826" />
-    <state width="1899" height="258" key="GridCell.Tab.0.left" timestamp="1653987272826">
+    <state width="1899" height="258" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
+    <state width="1899" height="258" key="GridCell.Tab.0.left" timestamp="1654063920956">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1653987272826" />
-    <state width="1899" height="258" key="GridCell.Tab.0.right" timestamp="1653987272827">
+    <state width="1899" height="258" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
+    <state width="1899" height="258" key="GridCell.Tab.0.right" timestamp="1654063920956">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1653987272827" />
+    <state width="1899" height="258" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1653987467412">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1653987467412" />
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1653637614636">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

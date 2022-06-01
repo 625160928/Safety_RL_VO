@@ -2,12 +2,14 @@ import math
 
 import numpy
 import yaml
+import matplotlib.pyplot as plt
+
 
 from orca_src.road_orca import RoadOrca
 from env.highway_sim_env import HighwaySimulation
 from env.grid_map import GridMap
 from orca_src.tubianxing import Is_rec_collide
-
+from orca_src import draw_picture
 """
 切换逻辑主程序部分
 """
@@ -71,7 +73,7 @@ class SwitchLogic():
         # return True
         return False
 
-    def orac_t_danger_action(self, obs, orca_speed):
+    def orac_t_danger_action(self, obs):
 
         my_agent_area=self.orca_policy.get_position_avaliable_set(obs[0], t=1)
         others_agent_area=[]
@@ -79,21 +81,25 @@ class SwitchLogic():
             ag=self.orca_policy.get_position_avaliable_set(obj, t=1)
             others_agent_area.append(ag)
 
+        plt.clf()
+        draw_picture.draw_tubianxing(my_agent_area,color='red')
+        for obj in others_agent_area:
+            draw_picture.draw_tubianxing(obj)
+        plt.pause(0.1)
 
         for area in others_agent_area:
             if Is_rec_collide(area, my_agent_area)==True:
-                print('type - 1 ',area, my_agent_area)
+                # print('type - 1 ',area, my_agent_area)
                 return True
-
-        my_agent_area = self.orca_policy.get_position_avaliable_set(obs[0], t=2)
-        others_agent_area = []
+        my_agent_area2 = self.orca_policy.get_position_avaliable_set(obs[0], t=2)
+        others_agent_area2 = []
         for obj in obs[1:]:
             ag = self.orca_policy.get_position_avaliable_set(obj, t=2)
-            others_agent_area.append(ag)
+            others_agent_area2.append(ag)
 
-        for area in others_agent_area:
-            if Is_rec_collide(area, my_agent_area)==True:
-                print('type - 2 ',area, my_agent_area)
+        for area in others_agent_area2:
+            if Is_rec_collide(area, my_agent_area2)==True:
+                # print('type - 2 ',area, my_agent_area2)
                 return True
         return False
 
@@ -192,7 +198,7 @@ class SwitchLogic():
 
             #危险判断，判断一段时间后的状态是否安全
             # if self.danger_action(pre_env_obs=predict_env_obs, orca_speed=pre_vel_speed):
-            if self.orac_t_danger_action(obs=obs, orca_speed=orca_action):
+            if self.orac_t_danger_action(obs=obs):
                 print('danger, choose ORCA action')
                 action=orca_action
                 if old=='rl':
