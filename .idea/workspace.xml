@@ -22,10 +22,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）">
+    <list default="true" id="f0da32b7-cba8-4a60-9bd4-c2d813c077dc" name="Default Changelist" comment="增加了位置可达集的绘图显示&#10;修正了各个车辆可达集均以0为原点的问题，该问题会导致所有车辆可达集均重合在原点导致认为所有可达集均有交集">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/highway_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/highway_config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orca_src/road_orca.py" beforeDir="false" afterPath="$PROJECT_DIR$/orca_src/road_orca.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,7 +223,14 @@
       <option name="project" value="LOCAL" />
       <updated>1653987463713</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="增加了位置可达集的绘图显示&#10;修正了各个车辆可达集均以0为原点的问题，该问题会导致所有车辆可达集均重合在原点导致认为所有可达集均有交集">
+      <created>1654064184049</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1654064184049</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -244,29 +251,34 @@
     <MESSAGE value="try add map v0.2" />
     <MESSAGE value="try add map v1" />
     <MESSAGE value="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）" />
-    <option name="LAST_COMMIT_MESSAGE" value="完成基于车辆可达集的可恢复区域、危险区域、安全区域的判断&#10;（但是算法一直认为会有交集）" />
+    <MESSAGE value="增加了位置可达集的绘图显示&#10;修正了各个车辆可达集均以0为原点的问题，该问题会导致所有车辆可达集均重合在原点导致认为所有可达集均有交集" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加了位置可达集的绘图显示&#10;修正了各个车辆可达集均以0为原点的问题，该问题会导致所有车辆可达集均重合在原点导致认为所有可达集均有交集" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1899" height="258" key="GridCell.Tab.0.bottom" timestamp="1654063920956">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1654484985641">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
-    <state width="1899" height="258" key="GridCell.Tab.0.center" timestamp="1654063920956">
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1654484985641" />
+    <state width="1899" height="258" key="GridCell.Tab.0.bottom" timestamp="1654498382320">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
-    <state width="1899" height="258" key="GridCell.Tab.0.left" timestamp="1654063920956">
+    <state width="1899" height="258" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1654498382320" />
+    <state width="1899" height="258" key="GridCell.Tab.0.center" timestamp="1654498382320">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
-    <state width="1899" height="258" key="GridCell.Tab.0.right" timestamp="1654063920956">
+    <state width="1899" height="258" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1654498382320" />
+    <state width="1899" height="258" key="GridCell.Tab.0.left" timestamp="1654498382320">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="258" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1654063920956" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1653987467412">
+    <state width="1899" height="258" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1654498382320" />
+    <state width="1899" height="258" key="GridCell.Tab.0.right" timestamp="1654498382320">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1653987467412" />
+    <state width="1899" height="258" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1654498382320" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1654064188132">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1654064188132" />
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1653637614636">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

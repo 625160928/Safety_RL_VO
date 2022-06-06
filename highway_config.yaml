@@ -24,7 +24,7 @@ car_radiu: 3.2
 
 #car parm
 car_steer_limit: 1.04 #3.14/3
-npc_car_steer_limit: 1.5 #3.14/2
+npc_car_steer_limit: 0.5236 #30度的样子？
 prev: 20
 min_turning_radiu: 15
 

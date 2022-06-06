@@ -33,8 +33,9 @@ class SwitchLogic():
     def get_orca_action(self,obs,method=None,map=None):
         return self.orca_policy.get_action(obs, method,map)
 
-    def get_rl_action(self,model,obs,road_map):
-        return (0.5,-0.5)
+    def get_rl_action(self,model,obs,road_map,method):
+        orca_action, vel_speed = self.orca_policy.get_action(obs, method, road_map)
+        return orca_action
 
     def danger_action(self, pre_env_obs, orca_speed):
 
@@ -145,7 +146,6 @@ class SwitchLogic():
         while not self.env.done:
             count += 1
 
-
             obs, reward, self.done, info = self.env.step(action)
 
             # ========================下面是反馈参数记录
@@ -180,24 +180,23 @@ class SwitchLogic():
 
 
             #获取当前时刻下的orca操作与rl操作
-            rl_action=self.get_rl_action(model,obs,road_map)
+            rl_action=self.get_rl_action(model,obs,road_map,self.default_method)
 
             if count<switch_count:
                 orca_action,vel_speed=self.get_orca_action(obs,self.default_method,road_map)
             else:
                 orca_action,vel_speed=self.get_orca_action(obs,switch_method,road_map)
 
-            #预测一段时间后的状态
-            predict_env_obs=self.env.env_predict(rl_action,obs)
-
-            #获取一段时间后的orca操作，用来作为危险判断参考
-            if count<switch_count:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,map=road_map)
-            else:
-                predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,method=switch_method,map=road_map)
+            # #预测一段时间后的状态
+            # predict_env_obs=self.env.env_predict(rl_action,obs)
+            #
+            # #获取一段时间后的orca操作，用来作为危险判断参考
+            # if count<switch_count:
+            #     predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,map=road_map)
+            # else:
+            #     predict_orca_action,pre_vel_speed = self.get_orca_action(predict_env_obs,method=switch_method,map=road_map)
 
             #危险判断，判断一段时间后的状态是否安全
-            # if self.danger_action(pre_env_obs=predict_env_obs, orca_speed=pre_vel_speed):
             if self.orac_t_danger_action(obs=obs):
                 print('danger, choose ORCA action')
                 action=orca_action
@@ -234,7 +233,8 @@ def main():
 
 
 
-    sim_env=HighwaySimulation(config)
+    sim_env=HighwaySimulation(env_name="merge-v0",config=config)
+    # sim_env=HighwaySimulation(env_name="highway-v0",config=config)
     new_highway_orca=SwitchLogic(sim_env)
     new_highway_orca.run()
 

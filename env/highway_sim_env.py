@@ -5,9 +5,10 @@ import math
 import numpy as np
 import gym
 import highway_env
+import merge_env
 
 class HighwaySimulation():
-    def __init__(self,config):
+    def __init__(self,env_name,config):
         #参数
         self.parm_config=config
         self.policy_frequency = config['policy_frequency']
@@ -37,7 +38,7 @@ class HighwaySimulation():
         }
 
         #仿真环境
-        self.env = gym.make("highway-v0")
+        self.env = gym.make(env_name)
         self.done = False
         self.env.seed(config['seed'])
         self.predict_time = 2
